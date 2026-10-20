@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+apps/api/data/
+node_modules/
+apps/web/.next/
+apps/web/out/
+*.log
+.env
+.DS_Store
+apps/web/next-env.d.ts
+apps/web/tsconfig.tsbuildinfo

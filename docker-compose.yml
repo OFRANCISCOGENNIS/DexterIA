@@ -1,0 +1,21 @@
+# Serviço de banco para desenvolvimento local.
+# Observação: este arquivo não pôde ser validado no ambiente onde o MVP foi construído (sem daemon Docker).
+# API e frontend rodam diretamente no host (ver README), pois o sandbox usa namespaces do Linux.
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: genisia
+      POSTGRES_PASSWORD: genisia
+      POSTGRES_DB: genisia
+    ports:
+      - "5432:5432"
+    volumes:
+      - genisia-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U genisia"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  genisia-pg:
