@@ -27,6 +27,9 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements-dev.txt
+      - name: Imagem do sandbox (backend docker)
+        working-directory: infrastructure/docker
+        run: docker build -t genisia-sandbox:latest -f sandbox.Dockerfile .
       - name: Testes (SQLite)
         run: python -m pytest -q
       - name: Testes (PostgreSQL)

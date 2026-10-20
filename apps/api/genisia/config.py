@@ -67,6 +67,7 @@ class Settings:
     sandbox_backend: str = field(default_factory=lambda: _env("GENISIA_SANDBOX_BACKEND", "auto"))
     sandbox_timeout_seconds: int = field(default_factory=lambda: _env_int("GENISIA_SANDBOX_TIMEOUT_SECONDS", 120))
     sandbox_memory_mb: int = field(default_factory=lambda: _env_int("GENISIA_SANDBOX_MEMORY_MB", 1024))
+    sandbox_image: str = field(default_factory=lambda: _env("GENISIA_SANDBOX_IMAGE", "genisia-sandbox:latest"))
     sandbox_dir_override: str | None = field(default_factory=lambda: _env("GENISIA_SANDBOX_DIR"))
     sandbox_max_output_kb: int = field(default_factory=lambda: _env_int("GENISIA_SANDBOX_MAX_OUTPUT_KB", 256))
 

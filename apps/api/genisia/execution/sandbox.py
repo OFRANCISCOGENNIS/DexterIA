@@ -5,8 +5,9 @@ Backends:
   (sem acesso à rede), executado como usuário sem privilégios (65534) quando o backend roda
   como root, com limites de CPU, memória, tamanho de arquivo e tempo, ambiente limpo e uma
   cópia descartável dos arquivos.
-- ``docker``: contêiner com ``--network none``, limites de memória/CPU/PIDs. Selecionado
-  automaticamente apenas se o daemon Docker responder.
+- ``docker``: contêiner descartável (imagem ``GENISIA_SANDBOX_IMAGE``) com ``--network none``,
+  ``--cap-drop ALL``, limites de memória/CPU/PIDs. Selecionado automaticamente quando não há
+  namespaces disponíveis e o daemon Docker responde.
 - ``process``: sem isolamento de rede/usuário. Só é usado se configurado explicitamente
   (GENISIA_SANDBOX_BACKEND=process) e deve ficar restrito a desenvolvimento.
 """
@@ -86,12 +87,29 @@ def _docker_available() -> bool:
         return False
 
 
+@lru_cache(maxsize=1)
+def _docker_image_ready() -> bool:
+    try:
+        return subprocess.run(["docker", "image", "inspect", settings.sandbox_image], capture_output=True, timeout=30).returncode == 0
+    except (subprocess.SubprocessError, OSError):
+        return False
+
+
+def _require_docker_image() -> None:
+    if not _docker_image_ready():
+        raise SandboxUnavailable(
+            f"Imagem do sandbox '{settings.sandbox_image}' não encontrada. Construa com: "
+            f"docker build -t {settings.sandbox_image} -f infrastructure/docker/sandbox.Dockerfile infrastructure/docker"
+        )
+
+
 def select_backend() -> str:
     choice = settings.sandbox_backend
     if choice == "auto":
         if _namespace_support():
             return "namespace"
         if _docker_available():
+            _require_docker_image()
             return "docker"
         raise SandboxUnavailable(
             "Nenhum mecanismo de isolamento disponível (unshare/Docker). "
@@ -99,8 +117,10 @@ def select_backend() -> str:
         )
     if choice == "namespace" and not _namespace_support():
         raise SandboxUnavailable("Namespaces Linux (unshare) indisponíveis neste ambiente")
-    if choice == "docker" and not _docker_available():
-        raise SandboxUnavailable("Daemon Docker indisponível")
+    if choice == "docker":
+        if not _docker_available():
+            raise SandboxUnavailable("Daemon Docker indisponível")
+        _require_docker_image()
     if choice not in {"namespace", "docker", "process"}:
         raise SandboxUnavailable(f"Backend de sandbox desconhecido: {choice}")
     return choice
@@ -115,7 +135,7 @@ def _traversable_by_others(path: Path) -> bool:
 
 
 def _check_sandbox_dir(backend: str) -> None:
-    if (backend == "namespace" and _namespace_support() == "root") or backend == "docker":
+    if backend == "namespace" and _namespace_support() == "root":
         if not _traversable_by_others(settings.sandbox_dir):
             raise SandboxUnavailable(
                 f"O diretório de sandbox {settings.sandbox_dir} não é acessível ao usuário sem privilégios "
@@ -136,6 +156,7 @@ def sandbox_status() -> dict:
         "reason": reason,
         "namespace_mode": _namespace_support(),
         "docker": _docker_available(),
+        "docker_image": settings.sandbox_image if _docker_available() and _docker_image_ready() else None,
         "network_default": "desabilitada",
         "timeout_seconds": settings.sandbox_timeout_seconds,
         "memory_mb": settings.sandbox_memory_mb,
@@ -241,13 +262,22 @@ def run_in_sandbox(
             prefix = ["unshare", "-r"] + ([] if network else ["-n"]) + ["--"]
         argv = prefix + command
         cwd = work
-    elif backend == "docker":  # pragma: no cover - não validado neste ambiente (sem daemon)
-        image = "python:3.12-slim" if command[0].startswith("python") else "node:22-slim"
-        argv = ["docker", "run", "--rm", "--network", "bridge" if network else "none",
+    elif backend == "docker":
+        # Contêiner descartável: só o diretório de trabalho é montado, sem rede, com limites de
+        # memória/CPU/PIDs. Como root, roda como 65534; caso contrário, com o UID do próprio backend
+        # (sem privilégios adicionais) para que a limpeza dos arquivos gerados funcione.
+        if os.geteuid() == 0:
+            _chown_tree(work, NOBODY_UID, NOBODY_GID)
+            user = f"{NOBODY_UID}:{NOBODY_GID}"
+        else:
+            user = f"{os.getuid()}:{os.getgid()}"
+        container = f"genisia-sbx-{run_root.name}"
+        argv = ["docker", "run", "--rm", "--name", container, "--network", "bridge" if network else "none",
                 "--memory", f"{limits['memory_mb']}m", "--cpus", "1", "--pids-limit", "256",
-                "--user", f"{NOBODY_UID}:{NOBODY_GID}", "-e", "HOME=/work", "-v", f"{work}:/work", "-w", "/work",
-                image, *command]
-        _chown_tree(work, NOBODY_UID, NOBODY_GID)
+                "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--user", user,
+                "-e", "HOME=/work", "-e", "PYTHONDONTWRITEBYTECODE=1", "-e", "PYTHONUNBUFFERED=1", "-e", "CI=1",
+                "-e", "npm_config_cache=/work/.npm-cache", "-v", f"{work}:/work", "-w", "/work",
+                settings.sandbox_image, *command]
         cwd = run_root
     else:
         argv = command
@@ -275,6 +305,8 @@ def run_in_sandbox(
                     os.killpg(proc.pid, signal.SIGKILL)
                 except ProcessLookupError:
                     pass
+                if backend == "docker":  # matar o cliente não para o contêiner
+                    subprocess.run(["docker", "rm", "-f", container], capture_output=True, timeout=30)
                 proc.wait()
                 break
         duration = time.monotonic() - start
