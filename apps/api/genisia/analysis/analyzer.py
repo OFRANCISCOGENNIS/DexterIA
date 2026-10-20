@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-ANALYZER_VERSION = "1.1.0"
+ANALYZER_VERSION = "1.2.0"
 
 SKIP_DIRS = {
     ".git", "node_modules", "__pycache__", ".pytest_cache", ".venv", "venv", "dist", "build", ".next",
@@ -164,6 +164,30 @@ def _walk(root: Path):
 
 def _norm_dep(name: str) -> str:
     return re.split(r"[<>=!~;\[\s]", name.strip(), maxsplit=1)[0].lower()
+
+
+def readme_summary(text: str) -> str:
+    """Escolhe o primeiro parágrafo descritivo do README (prosa, sem blocos de código/instalação)."""
+    text = re.sub(r"```.*?```", "", text, flags=re.S)
+    text = re.sub(r"<(div|p|table|picture)[^>]*>.*?</\1>", "", text, flags=re.S | re.I)
+    candidates: list[str] = []
+    for para in re.split(r"\n\s*\n", text):
+        if re.search(r"(?i)utm_|sign up|sponsor|patreon|buy me a coffee|fork our|https?://\S+\s*$", para) or len(re.findall(r"[·∙|]", para)) > 4:
+            continue  # propaganda, patrocínio ou seletor de idiomas
+        lines = [re.sub(r"^>\s?", "", ln).strip() for ln in para.strip().splitlines()]
+        if not lines or lines[0].startswith(("#", "|", "[!", "- ", "* ", "<", "!", "[![")):
+            continue
+        clean = re.sub(r"<[^>]+>|!\[[^\]]*\]\([^)]*\)", "", " ".join(lines))
+        clean = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", clean)
+        clean = re.sub(r"\s+", " ", clean).strip()
+        letters = sum(c.isalpha() for c in clean)
+        if len(clean) < 40 or letters < len(clean) * 0.6:
+            continue
+        if re.search(r"(?i)\b(npx|npm|pip|curl|brew|install|configure|run the)\b", clean) and len(candidates) < 5:
+            candidates.append(clean)  # parágrafo de instalação: só se não houver descrição melhor
+            continue
+        return clean[:600]
+    return candidates[0][:600] if candidates else ""
 
 
 class RepositoryAnalyzer:
@@ -437,12 +461,7 @@ class RepositoryAnalyzer:
                     title = re.sub(r"<[^>]+>|!\[[^\]]*\]\([^)]*\)", "", m.group(2)).strip()
                     if title:
                         outline.append(("  " * (len(m.group(1)) - 1)) + title)
-            paragraphs = [p.strip() for p in re.split(r"\n\s*\n", text) if p.strip()]
-            for p in paragraphs:
-                clean = re.sub(r"<[^>]+>|!\[[^\]]*\]\([^)]*\)|\[!\[.*?\]\(.*?\)\]\(.*?\)", "", p).strip()
-                if len(clean) > 80 and not clean.startswith(("#", "|", "```", "[", "*", "-", ">")):
-                    summary = re.sub(r"\s+", " ", clean)[:600]
-                    break
+            summary = readme_summary(text)
         md_files = [f for f in self.files if f["language"] in {"Markdown", "MDX"}]
         link_total = 0
         link_hosts: Counter[str] = Counter()

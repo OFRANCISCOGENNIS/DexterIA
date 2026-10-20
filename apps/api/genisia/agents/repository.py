@@ -122,8 +122,9 @@ class ReverseEngineerAgent(Agent):
             rea = report["rea"]
             md += "\n## Grafo JavaScript (REA)\n\n" + "\n".join([
                 f"- Ferramenta: {rea['tool']} · evidência `{rea['evidence_id']}`",
-                f"- Nós por tipo: {rea['node_kinds']}", f"- Relações: {rea['relations']}",
-                f"- Estados de evidência: {rea['evidence_states']}",
+                "- Nós por tipo: " + ", ".join(f"{k} ({v})" for k, v in rea["node_kinds"].items()),
+                "- Relações: " + ", ".join(f"{k} ({v})" for k, v in rea["relations"].items()),
+                "- Estados de evidência: " + ", ".join(f"{k}: {v}" for k, v in rea["evidence_states"].items()),
                 "- Módulos externos: " + ", ".join(f"`{m['module']}` ({m['count']})" for m in rea["external_modules"][:15]),
                 "", "Limitações declaradas pelo REA:", *[f"- {l}" for l in rea["limitations"]], ""])
         summary = {
