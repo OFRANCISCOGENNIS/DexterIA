@@ -68,7 +68,7 @@ Ao final da execução ficam visíveis, nesta ordem:
 | Aba | Origem | Conteúdo |
 |---|---|---|
 | **TRIPE CONCLUSAO** | TRIPÉ | 1 linha por obra: veredito final, veredito de cada análise, nº de famílias divergentes, motivo |
-| **TRIPE DETALHE** | TRIPÉ | 1 linha por PEP4 + família: qtd projeto, baixada SAP, material CKCP, serviço pago, e qual perna quebrou |
+| **TRIPE DETALHE** | TRIPÉ | 1 linha por PEP4 + família: família, descrição dos materiais (código - descrição), qtd projeto, baixada SAP, material CKCP, serviço pago, e qual perna quebrou |
 | ALERTAS CRITICOS | CKCP | alertas da análise de custo |
 | MATERIAL vs SERVICO | CKCP | aderência material × serviço por PEP4/família |
 | MATERIAL | CKCP | lançamentos de material |

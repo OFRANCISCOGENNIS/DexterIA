@@ -1,5 +1,10 @@
 # Changelog — TRIPÉ
 
+## v0.1.1 (2026-10-20)
+
+- TRIPE DETALHE: nova coluna `DESCRICAO DO MATERIAL` ao lado de `FAMILIA`, com os materiais do
+  inventário de cada PEP4 + família (`código - descrição`, até 15 por linha e depois `+n outros`).
+
 ## v0.1.0 — MVP (2026-10-20)
 
 - Macro única `GerarTripe` que roda a análise Projeto × Baixa SAP (`inventario.bas`) e a análise

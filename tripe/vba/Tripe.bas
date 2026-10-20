@@ -64,6 +64,8 @@ Private Type tGrupo
     Pep3 As String
     Pep4 As String
     Familia As String
+    Materiais As String     ' "COD - DESCRICAO | ..." (materiais do inventario)
+    NMat As Long            ' qtd de materiais distintos no grupo
     Tipo As String          ' UC / COM / UAR / SERV
     QPrj As Double          ' MAT PRJ CAD (inventario)
     QSap As Double          ' MAT LIB SAP (inventario)
@@ -82,6 +84,8 @@ Private g() As tGrupo
 Private nG As Long
 Private dG As Object        ' chave PEP4|FAMILIA -> indice em g()
 Private dAlias As Object    ' familia normalizada -> familia canonica
+Private dMatSeen As Object  ' indice do grupo|COD MAT -> 1 (sem repetir material)
+Private Const MAX_MAT_DESC As Long = 15   ' materiais listados por linha do detalhe
 
 ' Vereditos por obra (chave = PEP3 normalizado)
 Private dP3Nome As Object, dInvVer As Object, dInvMot As Object
@@ -154,6 +158,7 @@ Public Sub GerarTripe()
 
     mEtapa = "Carregar de-para de familias": CarregarAlias wb
     Set dG = CreateObject("Scripting.Dictionary")
+    Set dMatSeen = CreateObject("Scripting.Dictionary")
     Set dP3Nome = CreateObject("Scripting.Dictionary")
     Set dInvVer = CreateObject("Scripting.Dictionary")
     Set dInvMot = CreateObject("Scripting.Dictionary")
@@ -381,6 +386,8 @@ Private Sub AgregarInventario(a As Variant, mp As Object, ByVal porPep4 As Boole
     cLib = Col(mp, "MAT LIB SAP"): cPrj = Col(mp, "MAT PRJ CAD")
     cVal = Col(mp, "VALOR"): cSit = Col(mp, "SIT MAT")
     cApr = Col(mp, "APROVACAO"): cMot = Col(mp, "MOTIVO DEVOLUCAO PEP3")
+    Dim cCod As Long, cDesc As Long
+    cCod = Col(mp, "COD MAT"): cDesc = Col(mp, "DESC MAT")
 
     Dim i As Long, p3 As String, p4 As String, p3k As String, ix As Long
     Dim apr As String, sit As String
@@ -413,6 +420,7 @@ Private Sub AgregarInventario(a As Variant, mp As Object, ByVal porPep4 As Boole
             sit = NormTxt(Cel(a, i, cSit))
             If InStr(sit, "NAO ADER") > 0 Or InStr(sit, "DIVERG") > 0 Then .InvNaoAder = True
         End With
+        AddMaterial ix, Cel(a, i, cCod), Cel(a, i, cDesc)
 Prox:
     Next i
 End Sub
@@ -459,6 +467,24 @@ Private Sub AgregarCKCP(a As Variant, mp As Object, ByVal porPep4 As Boolean)
         End With
 Prox:
     Next i
+End Sub
+
+' Acrescenta "COD - DESCRICAO" na lista do grupo (sem repetir; ate MAX_MAT_DESC)
+Private Sub AddMaterial(ByVal ix As Long, ByVal cod As String, ByVal desc As String)
+    If cod = "" And desc = "" Then Exit Sub
+    Dim k As String: k = ix & "|" & IIf(cod <> "", cod, desc)
+    If dMatSeen.Exists(k) Then Exit Sub
+    dMatSeen.Add k, 1
+    Dim item As String
+    If cod <> "" And desc <> "" Then
+        item = cod & " - " & desc
+    Else
+        item = cod & desc
+    End If
+    g(ix).NMat = g(ix).NMat + 1
+    If g(ix).NMat <= MAX_MAT_DESC Then
+        g(ix).Materiais = g(ix).Materiais & IIf(g(ix).Materiais <> "", " | ", "") & item
+    End If
 End Sub
 
 Private Function PegarGrupo(ByVal p3k As String, ByVal p3 As String, _
@@ -563,7 +589,8 @@ Private Sub EscreverDetalhe(wb As Workbook, ByVal porPep4 As Boolean, ByVal pctM
     Dim ws As Worksheet: Set ws = NovaAba(wb, ABA_DET)
     Const HR As Long = 4
     Dim hdr As Variant
-    hdr = Array("VEREDITO FINAL PEP3", "PEP3NIVEL", "PEP4NIVEL", "FAMILIA", "TIPO", _
+    hdr = Array("VEREDITO FINAL PEP3", "PEP3NIVEL", "PEP4NIVEL", "FAMILIA", _
+                "DESCRICAO DO MATERIAL", "TIPO", _
                 "QTD PROJETO (PRJ)", "QTD BAIXADA SAP", "QTD MAT CKCP", "QTD SERVICO PAGO", _
                 "DIF SAP - PRJ", "DIF SRV - SAP", "VALOR SAP (R$)", _
                 "SIT PRJ x SAP", "SIT MAT x SRV", "SITUACAO TRIPE", "PERNA QUE QUEBROU")
@@ -596,38 +623,48 @@ Private Sub EscreverDetalhe(wb As Workbook, ByVal porPep4 As Boolean, ByVal pctM
             out(r, 2) = .Pep3
             out(r, 3) = .Pep4
             out(r, 4) = .Familia
-            out(r, 5) = .Tipo
-            out(r, 6) = Round(.QPrj, 2)
-            out(r, 7) = Round(.QSap, 2)
-            out(r, 8) = Round(.QMatCk, 2)
-            out(r, 9) = Round(.QSrv, 2)
-            out(r, 10) = Round(Abs(.QSap) - Abs(.QPrj), 2)
-            out(r, 11) = Round(Abs(.QSrv) - Abs(.QSap), 2)
-            out(r, 12) = Round(.VSap, 2)
-            out(r, 13) = IIf(.TemInv, IIf(.InvNaoAder, "NAO ADERENTE", "ADERENTE"), "-")
-            out(r, 14) = IIf(.TemCk, IIf(.CkNaoAder, "NAO ADERENTE", "ADERENTE"), "-")
-            out(r, 15) = .Situacao
-            out(r, 16) = .Perna
+            If .NMat = 0 Then
+                out(r, 5) = "-"
+            ElseIf .NMat > MAX_MAT_DESC Then
+                out(r, 5) = .Materiais & " | (+" & (.NMat - MAX_MAT_DESC) & " outros)"
+            Else
+                out(r, 5) = .Materiais
+            End If
+            out(r, 6) = .Tipo
+            out(r, 7) = Round(.QPrj, 2)
+            out(r, 8) = Round(.QSap, 2)
+            out(r, 9) = Round(.QMatCk, 2)
+            out(r, 10) = Round(.QSrv, 2)
+            out(r, 11) = Round(Abs(.QSap) - Abs(.QPrj), 2)
+            out(r, 12) = Round(Abs(.QSrv) - Abs(.QSap), 2)
+            out(r, 13) = Round(.VSap, 2)
+            out(r, 14) = IIf(.TemInv, IIf(.InvNaoAder, "NAO ADERENTE", "ADERENTE"), "-")
+            out(r, 15) = IIf(.TemCk, IIf(.CkNaoAder, "NAO ADERENTE", "ADERENTE"), "-")
+            out(r, 16) = .Situacao
+            out(r, 17) = .Perna
         End With
     Next r
     ws.Range(ws.Cells(HR + 1, 1), ws.Cells(HR + nG, nC)).Value = out
 
 Formata:
     FormatarTabela ws, HR, nG, nC
-    ws.Range(ws.Cells(HR + 1, 6), ws.Cells(HR + nG + 1, 11)).NumberFormat = "#,##0.##;[Red]-#,##0.##;-"
-    ws.Range(ws.Cells(HR + 1, 12), ws.Cells(HR + nG + 1, 12)).NumberFormat = "#,##0.00;[Red]-#,##0.00;-"
+    ws.Range(ws.Cells(HR + 1, 7), ws.Cells(HR + nG + 1, 12)).NumberFormat = "#,##0.##;[Red]-#,##0.##;-"
+    ws.Range(ws.Cells(HR + 1, 13), ws.Cells(HR + nG + 1, 13)).NumberFormat = "#,##0.00;[Red]-#,##0.00;-"
     For r = 1 To nG
         PintarVeredito ws.Cells(HR + r, 1)
-        PintarSituacao ws.Cells(HR + r, 13)
         PintarSituacao ws.Cells(HR + r, 14)
         PintarSituacao ws.Cells(HR + r, 15)
+        PintarSituacao ws.Cells(HR + r, 16)
     Next r
     ws.Columns(1).ColumnWidth = 14
     ws.Columns(2).ColumnWidth = 22: ws.Columns(3).ColumnWidth = 24
-    ws.Columns(4).ColumnWidth = 20: ws.Columns(5).ColumnWidth = 7
-    ws.Range("F:L").ColumnWidth = 13
-    ws.Columns(13).ColumnWidth = 14: ws.Columns(14).ColumnWidth = 14
-    ws.Columns(15).ColumnWidth = 38: ws.Columns(16).ColumnWidth = 18
+    ws.Columns(4).ColumnWidth = 20
+    ws.Columns(5).ColumnWidth = 60          ' DESCRICAO DO MATERIAL (texto quebra na celula)
+    ws.Range(ws.Cells(HR + 1, 5), ws.Cells(HR + nG + 1, 5)).WrapText = True
+    ws.Columns(6).ColumnWidth = 7
+    ws.Range("G:M").ColumnWidth = 13
+    ws.Columns(14).ColumnWidth = 14: ws.Columns(15).ColumnWidth = 14
+    ws.Columns(16).ColumnWidth = 38: ws.Columns(17).ColumnWidth = 18
 End Sub
 
 
