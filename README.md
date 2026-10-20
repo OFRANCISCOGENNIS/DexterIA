@@ -23,3 +23,7 @@ Criar um ecossistema tecnológico capaz de acelerar o desenvolvimento de softwar
 Construir uma plataforma capaz de transformar conhecimento técnico em soluções práticas, combinando inteligência artificial, programação e automação para criar sistemas cada vez mais eficientes.
 
 **Mais do que automatizar tarefas, o objetivo é desenvolver tecnologias capazes de analisar, executar, aprender com resultados e evoluir continuamente sob supervisão humana.**
+
+## 📦 Projetos
+
+- [**TRIPÉ**](tripe/): automação VBA que cruza Projeto × Baixa SAP × Serviço pago por obra (MVP v0.1).
