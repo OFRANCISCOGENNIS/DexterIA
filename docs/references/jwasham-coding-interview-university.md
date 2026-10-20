@@ -1,18 +1,18 @@
-<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa 8c92a824b3014a0aaf6c994fbe9bfbaa. -->
+<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa d2610c752fe54573814e40c81e896b0b. -->
 
 > **Papel no GENISIA AI:** Ciência da computação e algoritmos
 # Relatório de análise — jwasham/coding-interview-university
 
 - **Origem:** https://github.com/jwasham/coding-interview-university
 - **Commit analisado:** `717298bf219a30d7fb0671285c5f057b1bb74b27`
-- **Analisador:** GENISIA reverse-engineering v1.0.0 (estático)
+- **Analisador:** GENISIA reverse-engineering v1.2.0 (estático)
 - **Licença:** CC-BY-SA-4.0 (`LICENSE.txt`)
 
 > Legenda: ✅ **comprovado** (evidência em arquivo) · 🔎 **hipótese** (inferência heurística).
 
 ## Visão geral
 
-> This is my multi-month study plan for becoming a software engineer for a large company.
+> I originally created this as a short to-do list of study topics for becoming a software engineer, but it grew to the large list you see today. After going through this study plan, I got hired as a Software Development Engineer at Amazon! You probably won't have to study as much as I did. Anyway, everything you need is here. I studied about 8-12 hours a day, for several months. This is my story: Why I studied full-time for 8 months for a Google interview **Please Note:** You won't need to study as much as I did. I wasted a lot of time on things I didn't need to know. More info about that is bel
 
 _Trecho extraído do README._
 

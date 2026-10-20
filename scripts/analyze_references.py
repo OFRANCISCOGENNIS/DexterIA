@@ -128,7 +128,7 @@ def main() -> int:
                         "file": f"{name}.md" if report else None, "error": detail.get("error"),
                         "ingest": (next((s["result"] for s in ingest_detail["steps"] if s["step_key"] == "ingest"), None)
                                    if ingest_detail else None)})
-    lines = ["# Engenharia reversa dos repositórios de referência", "",
+    lines = ["## Resumo por repositório", "",
              "Relatórios gerados pelo próprio GENISIA AI (fluxo `analyze_repository`), com análise estática do commit indicado. "
              "✅ = comprovado por arquivo; 🔎 = hipótese. Nenhum código dos repositórios foi executado.", "",
              "| Repositório | Papel | Tipo provável | Linguagens | Licença | Arquivos | Itens indexados | Relatório |",

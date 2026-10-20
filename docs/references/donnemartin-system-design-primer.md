@@ -1,18 +1,18 @@
-<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa 2c559b22efc44ac4a1c7d722683c61cd. -->
+<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa a77a7be37a38485893b7e87649bb34d4. -->
 
 > **Papel no GENISIA AI:** Arquiteto de software assistido
 # Relatório de análise — donnemartin/system-design-primer
 
 - **Origem:** https://github.com/donnemartin/system-design-primer
 - **Commit analisado:** `ae9bbd7b02d90b9866215de185217d33f39ab733`
-- **Analisador:** GENISIA reverse-engineering v1.0.0 (estático)
+- **Analisador:** GENISIA reverse-engineering v1.2.0 (estático)
 - **Licença:** CC-BY-4.0 (`LICENSE.txt`)
 
 > Legenda: ✅ **comprovado** (evidência em arquivo) · 🔎 **hipótese** (inferência heurística).
 
 ## Visão geral
 
-> System design is a broad topic. There are a **vast number of resources scattered throughout the web** on system design principles.
+> Learn how to design large-scale systems. Prep for the system design interview.
 
 _Trecho extraído do README._
 

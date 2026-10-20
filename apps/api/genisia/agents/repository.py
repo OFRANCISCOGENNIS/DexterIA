@@ -118,7 +118,10 @@ class ReverseEngineerAgent(Agent):
         report["commit"] = commit
         source = repo.source_url if repo else f"workspace do projeto {name}"
         md = render_markdown(report, source=source, commit=commit)
-        if report.get("rea", {}).get("status") == "ok":
+        rea_status = report.get("rea", {}).get("status")
+        if rea_status and rea_status != "ok":
+            md += f"\n## Grafo JavaScript (REA)\n\nNão gerado ({rea_status}): {report['rea'].get('reason', '')}\n"
+        if rea_status == "ok":
             rea = report["rea"]
             md += "\n## Grafo JavaScript (REA)\n\n" + "\n".join([
                 f"- Ferramenta: {rea['tool']} · evidência `{rea['evidence_id']}`",

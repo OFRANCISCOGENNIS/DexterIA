@@ -1,18 +1,18 @@
-<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa 2a0aaf6a78334395b685c3b8b994869e. -->
+<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa 5d27ea5f4ed1472ca62ea806ef024e97. -->
 
 > **Papel no GENISIA AI:** Orquestração multiagente (referência)
 # Relatório de análise — ruvnet/ruflo
 
 - **Origem:** https://github.com/ruvnet/ruflo
-- **Commit analisado:** `ab40a99f3a0ff03442759fe082037d6a7630ad53`
-- **Analisador:** GENISIA reverse-engineering v1.0.0 (estático)
+- **Commit analisado:** `ce509ccb84947e110f149b8e996027c0f42cc4e6`
+- **Analisador:** GENISIA reverse-engineering v1.2.0 (estático)
 - **Licença:** MIT (`LICENSE`)
 
 > Legenda: ✅ **comprovado** (evidência em arquivo) · 🔎 **hipótese** (inferência heurística).
 
 ## Visão geral
 
-> For clients that support local stdio MCP servers, configure **command** `npx` and **arguments** `["-y", "ruflo@latest", "mcp", "start"]`. The equivalent server command is:
+> **Core** provides foundation tools. **Console** opens the agent cockpit. **Mods** add routing and policy enforcement inside Claude Code. Mods run with your account's permissions; review their code before installing.
 
 _Trecho extraído do README._
 
@@ -20,20 +20,20 @@ _Trecho extraído do README._
 
 | Métrica | Valor |
 |---|---|
-| Arquivos | 7978 |
-| Tamanho | 138.1 MB |
-| Linhas de código | 1137622 |
+| Arquivos | 7981 |
+| Tamanho | 138.2 MB |
+| Linhas de código | 1137897 |
 | Linhas de documentação (Markdown) | 479318 |
 | Links em Markdown | 542 |
 | Dependências declaradas | 242 |
-| Arquivos de teste | 1532 |
+| Arquivos de teste | 1535 |
 | Workflows de CI | 34 |
 
 ## Linguagens
 
 | Linguagem | Arquivos | Linhas |
 |---|---|---|
-| TypeScript | 3722 | 966249 |
+| TypeScript | 3725 | 966524 |
 | Markdown | 2195 | 479318 |
 | JavaScript | 586 | 118529 |
 | JSON | 576 | 279334 |
@@ -49,7 +49,7 @@ _Trecho extraído do README._
 ## Estrutura de diretórios (nível superior)
 
 ```
-v3/                                      4055 arquivos
+v3/                                      4058 arquivos
 plugins/                                 2138 arquivos
 ruflo/                                   565 arquivos
 .claude/                                 371 arquivos
@@ -185,7 +185,7 @@ README.md                                1 arquivos
 
 ## Módulos externos mais importados
 
-- `vitest` (1240)
+- `vitest` (1243)
 - `$lib` (442)
 - `claude-code` (414)
 - `fs` (346)
@@ -249,7 +249,7 @@ Or via CLI
 
 | Status | Categoria | Descoberta | Evidência |
 |---|---|---|---|
-| ✅ | estrutura | Linguagens predominantes — TypeScript (3722 arq.), Markdown (2195 arq.), JavaScript (586 arq.), JSON (576 arq.), Shell (203 arq.) | `inventário de arquivos` |
+| ✅ | estrutura | Linguagens predominantes — TypeScript (3725 arq.), Markdown (2195 arq.), JavaScript (586 arq.), JSON (576 arq.), Shell (203 arq.) | `inventário de arquivos` |
 | ✅ | tecnologia | Usa Commander.js — Categoria: cli | `package.json`<br>`v3/@claude-flow/cli/package.json`<br>`v3/@claude-flow/codex/package.json` |
 | ✅ | tecnologia | Usa Express — Categoria: backend | `package.json`<br>`ruflo/src/mcp-bridge/package.json`<br>`ruflo/src/ruvocal/mcp-bridge/package.json`<br>`v3/@claude-flow/cli/package.json` |
 | ✅ | tecnologia | Usa Hono — Categoria: backend | `ruflo/src/ruvocal/package.json` |
@@ -269,7 +269,7 @@ Or via CLI
 | ✅ | licença | Licença MIT — Detectada pelo texto do arquivo de licença. | `LICENSE` |
 | 🔎 | segurança | 100 possível(is) segredo(s) exposto(s) — Padrões de credenciais encontrados. Os valores não foram armazenados. | `.agents/skills/flow-nexus-platform/SKILL.md:69`<br>`.agents/skills/flow-nexus-platform/SKILL.md:77`<br>`.claude/commands/flow-nexus/user-tools.md:136`<br>`.claude/skills/flow-nexus-platform/SKILL.md:66` |
 | 🔎 | segurança | 59 chamada(s) potencialmente perigosa(s) — eval/exec, shell=True, innerHTML etc. Requer revisão manual do contexto. | `.claude/statusline.mjs:23 (js_child_process_exec)`<br>`.claude/helpers/metrics-db.mjs:245 (js_child_process_exec)`<br>`.claude/helpers/statusline.cjs:251 (js_child_process_exec)`<br>`.claude-plugin/scripts/ruflo-hook.cjs:94 (js_child_process_exec)` |
-| ✅ | qualidade | 1532 arquivo(s) de teste — Arquivos com padrão de teste encontrados. | `plugins/ruflo-adr/scripts/__tests__/adr-create-schema-2651.test.mjs`<br>`plugins/ruflo-adr/scripts/__tests__/adr-status-forms-4126.test.mjs`<br>`plugins/ruflo-adr/scripts/__tests__/import-root-exit-3097.test.mjs`<br>`plugins/ruflo-adr/scripts/__tests__/index-idempotency-2660.test.mjs` |
+| ✅ | qualidade | 1535 arquivo(s) de teste — Arquivos com padrão de teste encontrados. | `plugins/ruflo-adr/scripts/__tests__/adr-create-schema-2651.test.mjs`<br>`plugins/ruflo-adr/scripts/__tests__/adr-status-forms-4126.test.mjs`<br>`plugins/ruflo-adr/scripts/__tests__/import-root-exit-3097.test.mjs`<br>`plugins/ruflo-adr/scripts/__tests__/index-idempotency-2660.test.mjs` |
 | ✅ | devops | 34 workflow(s) de CI (GitHub Actions) | `.github/workflows/adr-166-mcp-bridge-security.yml`<br>`.github/workflows/all-plugins-smoke.yml`<br>`.github/workflows/business-pods-smoke.yml`<br>`.github/workflows/chatgpt-federation.yml` |
 | 🔎 | interfaces | 38 rota(s) HTTP detectada(s) — Extraídas por padrões textuais; podem existir rotas dinâmicas não detectadas. | `POST /mcp/${groupName} (ruflo/src/mcp-bridge/index.js)`<br>`GET /mcp/${groupName} (ruflo/src/mcp-bridge/index.js)`<br>`DELETE /mcp/${groupName} (ruflo/src/mcp-bridge/index.js)`<br>`POST /mcp (ruflo/src/mcp-bridge/index.js)` |
 | ✅ | interfaces | 60 ponto(s) de entrada — Declarados em manifestos ou por convenção de nome. | `bin: bin/cli.js (package.json)`<br>`main: dist/index.js (package.json)`<br>`conventional_entry: bin/cli.js (bin/cli.js)`<br>`main: src/server.mjs (plugins/ruflo-ai-team/package.json)` |
@@ -289,26 +289,22 @@ Or via CLI
 
 ## Grafo JavaScript (REA)
 
-- Ferramenta: REA JavaScript application analyzer · evidência `ev_976a4870e0b826cd711bb467d4fad7dee3ceaf3a2aa3345dfec82c3b15fd750c`
-- Nós por tipo: {'javascript-module': 28965, 'javascript-asset': 4227, 'unknown': 2735, 'endpoint': 685, 'artifact': 469, 'storage': 83, 'source-map': 70, 'source-module': 70, 'package': 54, 'electron-main': 50, 'electron-renderer': 15, 'worker': 2, 'electron-preload': 1}
-- Relações: {'imports': 37105, 'contains': 10780, 'exposes': 8513, 'calls': 586, 'persists_to': 175, 'loads': 66, 'maps_to': 13}
-- Estados de evidência: {'proven (observed)': 28885, 'hypothesis (inferred)': 81698, 'outros': 2735}
-- Módulos externos: `vitest` (4363), `node:fs` (3423), `node:path` (1962), `node:os` (953), `fs` (688), `claude-code/testing` (604), `node:url` (490), `node:child_process` (475), `path` (462), `node:crypto` (357), `node:assert/strict` (224), `os` (186), `child_process` (167), `node:test` (162), `node:fs/promises` (144)
+- Ferramenta: REA JavaScript application analyzer · evidência `ev_747ea991b89b5650f47b31d962c76efb93990bbf90c1223e2979c2aabe6f9946`
+- Nós por tipo: javascript-module (29013), javascript-asset (4230), unknown (2726), endpoint (678), artifact (469), storage (83), source-map (70), source-module (70), package (54), electron-main (50), electron-renderer (15), worker (2), electron-preload (1)
+- Relações: imports (37113), contains (10781), exposes (8538), calls (578), persists_to (175), loads (66), maps_to (13)
+- Estados de evidência: proven (observed): 28916, hypothesis (inferred): 81750, outros: 2726
+- Módulos externos: `vitest` (4376), `node:fs` (3429), `node:path` (1966), `node:os` (957), `fs` (680), `claude-code/testing` (604), `node:url` (490), `node:child_process` (475), `path` (462), `node:crypto` (357), `node:assert/strict` (224), `os` (185), `child_process` (167), `node:test` (162), `node:fs/promises` (144)
 
 Limitações declaradas pelo REA:
 - CommonJS and ESM binding relationships were recovered from inert syntax and resolved only within the inventoried artifact container.
 - Graph coverage is incomplete; unavailable facts remain explicit and must not be read as absence.
 - JavaScript and HTML were parsed as inert text; bundle bootstrap code was never executed.
-- Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/services/workspace-lease.ts exceed the parent's result budget; complete static facts were retained on the file node
-- Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/swarm/message-compressor.ts exceed the parent's result budget; complete static facts were retained on the file node
-- Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/anonymization/index.ts exceed the parent's result budget; complete static facts were retained on the file node
+- Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/services/worker-daemon.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/deploy-seraphine.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/export.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/index.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/ipfs/client.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/ipfs/upload.ts exceed the parent's result budget; complete static facts were retained on the file node
-- Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/models/seraphine.ts exceed the parent's result budget; complete static facts were retained on the file node
-- Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/serialization/cfp.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/storage/gcs.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/storage/index.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/store/discovery.ts exceed the parent's result budget; complete static facts were retained on the file node
@@ -316,9 +312,7 @@ Limitações declaradas pelo REA:
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/store/index.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/store/publish.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/store/registry.ts exceed the parent's result budget; complete static facts were retained on the file node
-- Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/store/search.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/store/tests/standalone-test.ts exceed the parent's result budget; complete static facts were retained on the file node
-- Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/store/types.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/test-seraphine.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/tests/test-store.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/cli/src/transfer/types.ts exceed the parent's result budget; complete static facts were retained on the file node
@@ -1141,6 +1135,7 @@ Limitações declaradas pelo REA:
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/swarm/__tests__/domain-agent-teardown.test.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/swarm/__tests__/domain-pool-agent-release.test.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/swarm/__tests__/domain-pool-no-autoscale.test.ts exceed the parent's result budget; complete static facts were retained on the file node
+- Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/swarm/__tests__/federation-agent-idempotency.test.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/swarm/__tests__/federation-transport.test.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/swarm/__tests__/gossip-transport.test.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for v3/@claude-flow/swarm/__tests__/idle-agent-heartbeat.test.ts exceed the parent's result budget; complete static facts were retained on the file node
@@ -1651,18 +1646,13 @@ Limitações declaradas pelo REA:
 - plugins/ruflo-ai-team/ui/team-board.html has 1 inline JavaScript body starting at line 43 that was not analyzed; endpoints, storage, imports and other facts in it are absent from the evidence.
 - ruflo/src/ruvocal/src/app.html has 2 inline JavaScript bodies starting at lines 10, 33 that were not analyzed; endpoints, storage, imports and other facts in them are absent from the evidence.
 - v3/@claude-flow/browser/docker/test-fixtures/index.html has 1 inline JavaScript body starting at line 50 that was not analyzed; endpoints, storage, imports and other facts in it are absent from the evidence.
-- v3/@claude-flow/cli/src/services/worker-queue.ts: Resource constraint during analyze_javascript_application: Completed module facts for v3/@claude-flow/cli/src/services/worker-queue.ts exceed the parent's offered result budget; static facts were retained
-- v3/@claude-flow/cli/src/services/workspace-lease.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/services/workspace-lease.ts was not started
-- v3/@claude-flow/cli/src/suggest.ts: Resource constraint during analyze_javascript_application: Completed module facts for v3/@claude-flow/cli/src/suggest.ts exceed the parent's offered result budget; static facts were retained
-- v3/@claude-flow/cli/src/swarm/message-compressor.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/swarm/message-compressor.ts was not started
-- v3/@claude-flow/cli/src/transfer/anonymization/index.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/anonymization/index.ts was not started
+- v3/@claude-flow/cli/src/services/worker-daemon.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/services/worker-daemon.ts was not started
 - v3/@claude-flow/cli/src/transfer/deploy-seraphine.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/deploy-seraphine.ts was not started
 - v3/@claude-flow/cli/src/transfer/export.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/export.ts was not started
 - v3/@claude-flow/cli/src/transfer/index.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/index.ts was not started
 - v3/@claude-flow/cli/src/transfer/ipfs/client.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/ipfs/client.ts was not started
 - v3/@claude-flow/cli/src/transfer/ipfs/upload.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/ipfs/upload.ts was not started
-- v3/@claude-flow/cli/src/transfer/models/seraphine.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/models/seraphine.ts was not started
-- v3/@claude-flow/cli/src/transfer/serialization/cfp.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/serialization/cfp.ts was not started
+- v3/@claude-flow/cli/src/transfer/serialization/cfp.ts: Resource constraint during analyze_javascript_application: Completed module facts for v3/@claude-flow/cli/src/transfer/serialization/cfp.ts exceed the parent's offered result budget; static facts were retained
 - v3/@claude-flow/cli/src/transfer/storage/gcs.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/storage/gcs.ts was not started
 - v3/@claude-flow/cli/src/transfer/storage/index.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/storage/index.ts was not started
 - v3/@claude-flow/cli/src/transfer/store/discovery.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/store/discovery.ts was not started
@@ -1670,9 +1660,9 @@ Limitações declaradas pelo REA:
 - v3/@claude-flow/cli/src/transfer/store/index.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/store/index.ts was not started
 - v3/@claude-flow/cli/src/transfer/store/publish.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/store/publish.ts was not started
 - v3/@claude-flow/cli/src/transfer/store/registry.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/store/registry.ts was not started
-- v3/@claude-flow/cli/src/transfer/store/search.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/store/search.ts was not started
+- v3/@claude-flow/cli/src/transfer/store/search.ts: Resource constraint during analyze_javascript_application: Completed module facts for v3/@claude-flow/cli/src/transfer/store/search.ts exceed the parent's offered result budget; static facts were retained
 - v3/@claude-flow/cli/src/transfer/store/tests/standalone-test.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/store/tests/standalone-test.ts was not started
-- v3/@claude-flow/cli/src/transfer/store/types.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/store/types.ts was not started
+- v3/@claude-flow/cli/src/transfer/store/types.ts: Resource constraint during analyze_javascript_application: Completed module facts for v3/@claude-flow/cli/src/transfer/store/types.ts exceed the parent's offered result budget; static facts were retained
 - v3/@claude-flow/cli/src/transfer/test-seraphine.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/test-seraphine.ts was not started
 - v3/@claude-flow/cli/src/transfer/tests/test-store.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/tests/test-store.ts was not started
 - v3/@claude-flow/cli/src/transfer/types.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/cli/src/transfer/types.ts was not started
@@ -2495,6 +2485,7 @@ Limitações declaradas pelo REA:
 - v3/@claude-flow/swarm/__tests__/domain-agent-teardown.test.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/swarm/__tests__/domain-agent-teardown.test.ts was not started
 - v3/@claude-flow/swarm/__tests__/domain-pool-agent-release.test.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/swarm/__tests__/domain-pool-agent-release.test.ts was not started
 - v3/@claude-flow/swarm/__tests__/domain-pool-no-autoscale.test.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/swarm/__tests__/domain-pool-no-autoscale.test.ts was not started
+- v3/@claude-flow/swarm/__tests__/federation-agent-idempotency.test.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/swarm/__tests__/federation-agent-idempotency.test.ts was not started
 - v3/@claude-flow/swarm/__tests__/federation-transport.test.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/swarm/__tests__/federation-transport.test.ts was not started
 - v3/@claude-flow/swarm/__tests__/gossip-transport.test.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/swarm/__tests__/gossip-transport.test.ts was not started
 - v3/@claude-flow/swarm/__tests__/idle-agent-heartbeat.test.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of v3/@claude-flow/swarm/__tests__/idle-agent-heartbeat.test.ts was not started
@@ -3126,7 +3117,7 @@ Limitações declaradas pelo REA:
 
 # Métricas de otimização — ruvnet/ruflo
 
-- Linhas de código: 1137622
+- Linhas de código: 1137897
 - Blocos duplicados (janelas de 6 linhas): 10380
 - Funções Python com 80+ linhas: 0
 

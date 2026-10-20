@@ -1,12 +1,12 @@
-<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa 4875ae4c03654cf692df5dcb43d220bf. -->
+<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa ce2b0b872ffd4972aa7efc92d3c86ae8. -->
 
 > **Papel no GENISIA AI:** Planejador de evolução técnica
 # Relatório de análise — nilbuild/developer-roadmap
 
 - **Origem:** https://github.com/nilbuild/developer-roadmap
 - **Commit analisado:** `46aa6a6b533feda20a8f36172188ddb4d7e82ed4`
-- **Analisador:** GENISIA reverse-engineering v1.0.0 (estático)
-- **Licença:** desconhecida (`license`)
+- **Analisador:** GENISIA reverse-engineering v1.2.0 (estático)
+- **Licença:** Proprietária (uso pessoal) (`license`)
 
 > Legenda: ✅ **comprovado** (evidência em arquivo) · 🔎 **hipótese** (inferência heurística).
 
@@ -107,7 +107,7 @@ tsconfig.json                            1 arquivos
 |---|---|---|---|
 | ✅ | estrutura | Linguagens predominantes — Markdown (11048 arq.), YAML (17 arq.), TypeScript (8 arq.), JSON (2 arq.), JavaScript (1 arq.) | `inventário de arquivos` |
 | ✅ | tecnologia | Usa TypeScript — Categoria: language | `package.json` |
-| 🔎 | licença | Licença desconhecida — Detectada pelo texto do arquivo de licença. | `license` |
+| ✅ | licença | Licença restritiva: Proprietária (uso pessoal) — Não reutilize código ou conteúdo sem autorização; apenas links podem ser referenciados. | `license` |
 | ✅ | qualidade | Nenhum arquivo de teste encontrado — Não há arquivos com padrão de teste reconhecido. |  |
 | ✅ | devops | 8 workflow(s) de CI (GitHub Actions) | `.github/workflows/aws-costs.yml`<br>`.github/workflows/cleanup-orphaned-content.yml`<br>`.github/workflows/close-feedback-pr.yml`<br>`.github/workflows/cloudfront-api-cache.yml` |
 
@@ -124,11 +124,11 @@ tsconfig.json                            1 arquivos
 
 ## Grafo JavaScript (REA)
 
-- Ferramenta: REA JavaScript application analyzer · evidência `ev_43c33267265015ba4650b7b704e628d22678d035fae0dfb86e764ce9b390ebcd`
-- Nós por tipo: {'javascript-module': 60, 'javascript-asset': 9, 'endpoint': 5, 'artifact': 3, 'unknown': 1, 'package': 1}
-- Relações: {'imports': 36, 'contains': 22, 'exposes': 15, 'calls': 5}
-- Estados de evidência: {'proven (observed)': 63, 'hypothesis (inferred)': 104, 'outros': 1}
-- Módulos externos: `node:fs/promises` (6), `node:path` (6), `node:url` (6), `turndown` (2), `node-html-parser` (2), `markdown-it` (2)
+- Ferramenta: REA JavaScript application analyzer · evidência `ev_897849ceedc226e3c05a74e7a865364fa08da6bb6c07203b4e04df536f2ed583`
+- Nós por tipo: javascript-module (60), javascript-asset (9), endpoint (5), artifact (3), unknown (1), package (1)
+- Relações: imports (36), contains (22), exposes (15), calls (5)
+- Estados de evidência: proven (observed): 63, hypothesis (inferred): 104, outros: 1
+- Módulos externos: `node:fs/promises` (6), `node:path` (6), `node:url` (6), `markdown-it` (2), `turndown` (2), `node-html-parser` (2)
 
 Limitações declaradas pelo REA:
 - CommonJS and ESM binding relationships were recovered from inert syntax and resolved only within the inventoried artifact container.
@@ -142,7 +142,7 @@ Limitações declaradas pelo REA:
 
 - Itens indexados: **98** {'resource': 98}
 - Arquivos de origem: `readme.md`
-- Somente metadados e links foram armazenados (licença da fonte: desconhecida).
+- Somente metadados e links foram armazenados (licença da fonte: Proprietária (uso pessoal)).
 
 ---
 

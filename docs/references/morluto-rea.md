@@ -1,11 +1,11 @@
-<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa 089f513fe9d3417d9d292186788531fa. -->
+<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa 6398931d9c0e46e18ccbbb086b8b00af. -->
 
 > **Papel no GENISIA AI:** Engenharia reversa assistida (adaptador)
 # Relatório de análise — morluto/rea
 
 - **Origem:** https://github.com/morluto/rea
 - **Commit analisado:** `c374c2fe7290b914d73d9e27af38b498753ec593`
-- **Analisador:** GENISIA reverse-engineering v1.0.0 (estático)
+- **Analisador:** GENISIA reverse-engineering v1.2.0 (estático)
 - **Licença:** MIT (`LICENSE`)
 
 > Legenda: ✅ **comprovado** (evidência em arquivo) · 🔎 **hipótese** (inferência heurística).
@@ -198,10 +198,10 @@ REA: Reverse Engineer Anything
 
 ## Grafo JavaScript (REA)
 
-- Ferramenta: REA JavaScript application analyzer · evidência `ev_4bb713ab76b5fa08a2b516dfd7ba0d414af7499cf2e691b432b6a29719f7aaa1`
-- Nós por tipo: {'javascript-module': 16358, 'javascript-asset': 4109, 'unknown': 2866, 'endpoint': 648, 'artifact': 85, 'electron-renderer': 26, 'package': 4, 'electron-main': 2, 'service-worker': 1, 'worker': 1}
-- Relações: {'imports': 35695, 'contains': 9762, 'exposes': 5348, 'calls': 246, 'loads': 55, 'maps_to': 25}
-- Estados de evidência: {'proven (observed)': 23514, 'hypothesis (inferred)': 56652, 'outros': 2866}
+- Ferramenta: REA JavaScript application analyzer · evidência `ev_d28efe1fe923bf424515a0a7fcf3200ed17b94ea2febcd4dcacc1493e632f22a`
+- Nós por tipo: javascript-module (16368), javascript-asset (4109), unknown (2856), endpoint (648), artifact (85), electron-renderer (26), package (4), electron-main (2), service-worker (1), worker (1)
+- Relações: imports (35770), contains (9757), exposes (5353), calls (246), loads (55), maps_to (25)
+- Estados de evidência: proven (observed): 23514, hypothesis (inferred): 56737, outros: 2856
 - Módulos externos: `vitest` (2525), `node:fs/promises` (1782), `node:path` (1362), `zod` (824), `node:crypto` (650), `node:url` (402), `node:assert/strict` (368), `node:util` (338), `node:child_process` (311), `node:os` (283), `node:fs` (225), `@modelcontextprotocol/client` (209), `@babel/types` (188), `@modelcontextprotocol/client/stdio` (173), `incur` (127)
 
 Limitações declaradas pelo REA:
@@ -210,13 +210,8 @@ Limitações declaradas pelo REA:
 - Electron relationships are derived from inert syntax; runtime registration, reachability, defaults, and enforcement remain unproven.
 - Graph coverage is incomplete; unavailable facts remain explicit and must not be read as absence.
 - JavaScript and HTML were parsed as inert text; bundle bootstrap code was never executed.
-- Resource constraint during analyze_javascript_application: Expanded application relationships for src/server/registerApplicationTools/traceSemantics.ts exceed the parent's result budget; complete static facts were retained on the file node
-- Resource constraint during analyze_javascript_application: Expanded application relationships for src/server/registerArtifactComparisonTool.ts exceed the parent's result budget; complete static facts were retained on the file node
-- Resource constraint during analyze_javascript_application: Expanded application relationships for src/server/registerBinaryDiagnosticsTools.ts exceed the parent's result budget; complete static facts were retained on the file node
-- Resource constraint during analyze_javascript_application: Expanded application relationships for src/server/registerBrowserScenarioTool.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for src/server/registerBrowserTools.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for src/server/registerBundleComparisonTool.ts exceed the parent's result budget; complete static facts were retained on the file node
-- Resource constraint during analyze_javascript_application: Expanded application relationships for src/server/registerCaptureTools.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for src/server/registerCloseLifecycleTool.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for src/server/registerCutterTools.ts exceed the parent's result budget; complete static facts were retained on the file node
 - Resource constraint during analyze_javascript_application: Expanded application relationships for src/server/registerDesktopApplicationTool.ts exceed the parent's result budget; complete static facts were retained on the file node
@@ -1647,13 +1642,8 @@ Limitações declaradas pelo REA:
 - Static imports, entrypoints, workers, endpoints, and storage relationships do not prove runtime execution.
 - Static paths and relationships may remain unresolved when expressions are dynamic or obfuscated.
 - Webpack/Rspack factories were recovered from AST literals; REA did not invoke push handlers or bundle bootstrap code.
-- src/server/registerApplicationTools/traceSemantics.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of src/server/registerApplicationTools/traceSemantics.ts was not started
-- src/server/registerArtifactComparisonTool.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of src/server/registerArtifactComparisonTool.ts was not started
-- src/server/registerBinaryDiagnosticsTools.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of src/server/registerBinaryDiagnosticsTools.ts was not started
-- src/server/registerBrowserScenarioTool.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of src/server/registerBrowserScenarioTool.ts was not started
 - src/server/registerBrowserTools.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of src/server/registerBrowserTools.ts was not started
 - src/server/registerBundleComparisonTool.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of src/server/registerBundleComparisonTool.ts was not started
-- src/server/registerCaptureTools.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of src/server/registerCaptureTools.ts was not started
 - src/server/registerCloseLifecycleTool.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of src/server/registerCloseLifecycleTool.ts was not started
 - src/server/registerCutterTools.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of src/server/registerCutterTools.ts was not started
 - src/server/registerDesktopApplicationTool.ts: Resource constraint during analyze_javascript_application: The parent reserved its remaining result capacity for static observations; semantic analysis of src/server/registerDesktopApplicationTool.ts was not started
