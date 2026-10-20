@@ -1,20 +1,16 @@
-<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa 3f3cdb2036b14bb883542d1640f844b5. -->
+<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa 665132c66c74480897787835a169b8e8. -->
 
 > **Papel no GENISIA AI:** Catálogo de ferramentas e recursos
 # Relatório de análise — sindresorhus/awesome
 
 - **Origem:** https://github.com/sindresorhus/awesome
 - **Commit analisado:** `bc98e517ddca672f55f9857d714fc3ea3c3540b2`
-- **Analisador:** GENISIA reverse-engineering v1.0.0 (estático)
+- **Analisador:** GENISIA reverse-engineering v1.2.0 (estático)
 - **Licença:** CC0-1.0 (`license`)
 
 > Legenda: ✅ **comprovado** (evidência em arquivo) · 🔎 **hipótese** (inferência heurística).
 
 ## Visão geral
-
-> Check out my macOS app Supercharge Elevate your Mac experience My open source work is supported by the community Special thanks to: Fast remote container builds and GitHub Actions runners. What is an awesome list?&nbsp;&nbsp;&nbsp; Contribution guide&nbsp;&nbsp;&nbsp; Creating a list&nbsp;&nbsp;&nbsp; Twitter&nbsp;&nbsp;&nbsp; Subscribe (RSS)&nbsp;&nbsp;&nbsp; Just type awesome.re to go here. Check out my apps and follow me on Twitter.
-
-_Trecho extraído do README._
 
 🔎 **Tipo provável:** lista curada / catálogo de links — 723 links Markdown e mais linhas de documentação (1177) que de código (23)
 

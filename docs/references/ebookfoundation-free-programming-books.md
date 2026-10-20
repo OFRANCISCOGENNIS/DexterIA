@@ -1,30 +1,30 @@
-<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa 1374f9652de04608821c7167d8c7c127. -->
+<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa 10e6f8a839c0475fad97142468aae863. -->
 
 > **Papel no GENISIA AI:** Biblioteca de livros e cursos gratuitos
 # Relatório de análise — EbookFoundation/free-programming-books
 
 - **Origem:** https://github.com/EbookFoundation/free-programming-books
-- **Commit analisado:** `8ab23f965b3a71931ac5a560cda90a8a1d849fdf`
-- **Analisador:** GENISIA reverse-engineering v1.0.0 (estático)
+- **Commit analisado:** `eb55e4e8c3ac3a57f89bd36258ab7f826d3a74a6`
+- **Analisador:** GENISIA reverse-engineering v1.2.0 (estático)
 - **Licença:** CC-BY-4.0 (`LICENSE`)
 
 > Legenda: ✅ **comprovado** (evidência em arquivo) · 🔎 **hipótese** (inferência heurística).
 
 ## Visão geral
 
-> Search the list at [https://ebookfoundation.github.io/free-programming-books-search/](https://ebookfoundation.github.io/free-programming-books-search/) .
+> This list was originally a clone of StackOverflow - List of Freely Available Programming Books with contributions from Karan Bhangui and George Stocker.
 
 _Trecho extraído do README._
 
-🔎 **Tipo provável:** lista curada / catálogo de links — 11945 links Markdown e mais linhas de documentação (32467) que de código (605)
+🔎 **Tipo provável:** lista curada / catálogo de links — 11941 links Markdown e mais linhas de documentação (32463) que de código (605)
 
 | Métrica | Valor |
 |---|---|
 | Arquivos | 234 |
 | Tamanho | 2.2 MB |
 | Linhas de código | 605 |
-| Linhas de documentação (Markdown) | 32467 |
-| Links em Markdown | 11945 |
+| Linhas de documentação (Markdown) | 32463 |
+| Links em Markdown | 11941 |
 | Dependências declaradas | 0 |
 | Arquivos de teste | 0 |
 | Workflows de CI | 7 |
@@ -33,7 +33,7 @@ _Trecho extraído do README._
 
 | Linguagem | Arquivos | Linhas |
 |---|---|---|
-| Markdown | 217 | 32467 |
+| Markdown | 217 | 32463 |
 | YAML | 11 | 801 |
 | HTML | 1 | 9 |
 | Python | 1 | 605 |
@@ -59,13 +59,13 @@ _includes/                               1 arquivos
 
 ## Módulos externos mais importados
 
-- `sys` (1)
+- `os` (1)
 - `re` (1)
 - `yaml` (1)
-- `subprocess` (1)
-- `os` (1)
-- `argparse` (1)
 - `bidi` (1)
+- `argparse` (1)
+- `subprocess` (1)
+- `sys` (1)
 
 ## Mapa do README
 
@@ -89,7 +89,7 @@ List of Free Learning Resources In Many Languages
 ## Domínios mais referenciados
 
 - youtube.com (3467)
-- github.com (647)
+- github.com (648)
 - web.archive.org (316)
 - example.com (211)
 - udemy.com (171)

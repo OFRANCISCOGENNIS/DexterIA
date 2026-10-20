@@ -1,18 +1,18 @@
-<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa 1bf88db55a584122bfd1fae3d72c0912. -->
+<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa 3ddffad0682c4a24ba67820aa4ec3c91. -->
 
 > **Papel no GENISIA AI:** Catálogo de APIs
 # Relatório de análise — public-apis/public-apis
 
 - **Origem:** https://github.com/public-apis/public-apis
 - **Commit analisado:** `93086df88fbce354dd612373ab755f941f53a473`
-- **Analisador:** GENISIA reverse-engineering v1.0.0 (estático)
+- **Analisador:** GENISIA reverse-engineering v1.2.0 (estático)
 - **Licença:** MIT (`LICENSE`)
 
 > Legenda: ✅ **comprovado** (evidência em arquivo) · 🔎 **hipótese** (inferência heurística).
 
 ## Visão geral
 
-> Fork our official [APILayer Postman Collection](https://www.postman.com/apilayer/apilayer/collection/2uo8qbu/apilayer-suite) and get started in under 60 seconds.
+> Maintain an open-source MCP server? Add it.
 
 _Trecho extraído do README._
 
@@ -54,12 +54,12 @@ README.md                                1 arquivos
 
 - `validate` (3)
 - `unittest` (2)
-- `sys` (2)
 - `typing` (2)
 - `re` (2)
+- `sys` (2)
 - `string` (1)
-- `requests` (1)
 - `random` (1)
+- `requests` (1)
 
 ## Mapa do README
 

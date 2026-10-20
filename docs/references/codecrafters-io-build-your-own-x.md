@@ -1,11 +1,11 @@
-<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa c3b526a383f447cb8118d9a813da9fe1. -->
+<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa f1dc0300a5d4484fb9499d985d59c2a2. -->
 
 > **Papel no GENISIA AI:** Laboratório de construção do zero (tutoriais)
 # Relatório de análise — codecrafters-io/build-your-own-x
 
 - **Origem:** https://github.com/codecrafters-io/build-your-own-x
 - **Commit analisado:** `aa17439b62f384511a5561ce308e9598b94d8989`
-- **Analisador:** GENISIA reverse-engineering v1.0.0 (estático)
+- **Analisador:** GENISIA reverse-engineering v1.2.0 (estático)
 - **Licença:** não encontrada
 
 > Legenda: ✅ **comprovado** (evidência em arquivo) · 🔎 **hipótese** (inferência heurística).

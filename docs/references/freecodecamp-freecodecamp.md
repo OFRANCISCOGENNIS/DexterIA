@@ -1,18 +1,18 @@
-<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa 06b801720d48497db0cd8f43627cc4b4. -->
+<!-- Gerado pelo GENISIA AI (scripts/analyze_references.py) a partir da tarefa bacae44649444971906f7a927879e21b. -->
 
 > **Papel no GENISIA AI:** Aprendizagem prática
 # Relatório de análise — freeCodeCamp/freeCodeCamp
 
 - **Origem:** https://github.com/freeCodeCamp/freeCodeCamp
 - **Commit analisado:** `51140b9d3d8cb6b01bd27c78432e1b725eb31ebc`
-- **Analisador:** GENISIA reverse-engineering v1.0.0 (estático)
+- **Analisador:** GENISIA reverse-engineering v1.2.0 (estático)
 - **Licença:** BSD-3-Clause (`LICENSE.md`)
 
 > Legenda: ✅ **comprovado** (evidência em arquivo) · 🔎 **hipótese** (inferência heurística).
 
 ## Visão geral
 
-> Our full-stack web development and machine learning curriculum is completely free and self-paced. We have thousands of interactive coding challenges to help you expand your skills.
+> freeCodeCamp.org is a friendly community where you can learn to code for free. It is run by a donor-supported 501(c)(3) charity to help millions of busy adults transition into tech. Our community has already helped more than 100,000 people get their first developer job.
 
 _Trecho extraído do README._
 
@@ -257,10 +257,10 @@ pnpm-workspace.yaml                      1 arquivos
 
 ## Grafo JavaScript (REA)
 
-- Ferramenta: REA JavaScript application analyzer · evidência `ev_8e778cca9a51e4cb04da04fc2df396624a07ae7427c97e0d24acbb04827be255`
-- Nós por tipo: {'javascript-module': 12237, 'artifact': 1262, 'javascript-asset': 1182, 'endpoint': 281, 'storage': 21, 'package': 16, 'electron-main': 11, 'worker': 4, 'unknown': 3, 'electron-renderer': 1, 'service-worker': 1}
-- Relações: {'imports': 13925, 'contains': 3692, 'exposes': 1886, 'calls': 234, 'persists_to': 37, 'loads': 17, 'maps_to': 2}
-- Estados de evidência: {'proven (observed)': 9425, 'hypothesis (inferred)': 29303, 'outros': 3}
+- Ferramenta: REA JavaScript application analyzer · evidência `ev_2bfc10753186ff071505785d3f1b06a05692a915f6bf045039a968aab9053bc2`
+- Nós por tipo: javascript-module (12237), artifact (1262), javascript-asset (1182), endpoint (281), storage (21), package (16), electron-main (11), worker (4), unknown (3), electron-renderer (1), service-worker (1)
+- Relações: imports (13925), contains (3692), exposes (1886), calls (234), persists_to (37), loads (17), maps_to (2)
+- Estados de evidência: proven (observed): 9425, hypothesis (inferred): 29303, outros: 3
 - Módulos externos: `vitest` (1424), `react` (1080), `@freecodecamp/ui` (566), `react-i18next` (447), `@testing-library/react` (327), `react-redux` (252), `@playwright/test` (155), `@freecodecamp/shared/config/curriculum` (153), `@fastify/type-provider-typebox` (149), `reselect` (118), `path` (107), `@freecodecamp/shared/config/challenge-types` (102), `redux` (97), `redux-saga/effects` (95), `lodash-es` (93)
 
 Limitações declaradas pelo REA:
