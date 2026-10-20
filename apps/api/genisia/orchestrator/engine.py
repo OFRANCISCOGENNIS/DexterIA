@@ -83,10 +83,16 @@ def _dep_state(deps: list[Task]) -> str:
     return "ready"
 
 
-def tick(db: Session) -> list[str]:
+INTERACTIVE_PRIORITY = 3  # fluxos de projeto iniciados pelo usuário
+BACKGROUND_PRIORITY = 6   # análises/ingestões de repositórios (longas)
+
+
+def tick(db: Session, capacity: int | None = None) -> list[str]:
     """Propaga bloqueios, finaliza fluxos concluídos e reivindica etapas prontas.
 
-    Retorna os ids das etapas reivindicadas (status ``running``), que devem ser executadas.
+    ``capacity`` limita quantas etapas são reivindicadas (vagas livres no pool). Etapas de segundo
+    plano nunca ocupam a última vaga livre, para que tarefas interativas não fiquem presas atrás de
+    análises demoradas. Retorna os ids das etapas reivindicadas (status ``running``).
     """
     claimed: list[str] = []
     queued = db.scalars(select(Task).where(Task.kind == "step", Task.status == "queued")
@@ -103,6 +109,12 @@ def tick(db: Session) -> list[str]:
             continue
         if state == "waiting":
             continue
+        if capacity is not None:
+            free = capacity - len(claimed)
+            if free <= 0:
+                break
+            if task.priority > INTERACTIVE_PRIORITY and free <= 1 and capacity > 1:
+                continue
         result = db.execute(update(Task).where(Task.id == task.id, Task.status == "queued").values(
             status="running", attempts=Task.attempts + 1, started_at=utcnow()))
         db.commit()
@@ -356,7 +368,7 @@ class Worker:
                 if busy < self.threads:
                     db = session_factory()()
                     try:
-                        claimed = tick(db)
+                        claimed = tick(db, capacity=self.threads - busy)
                     finally:
                         db.close()
                     for task_id in claimed:

@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-ANALYZER_VERSION = "1.0.0"
+ANALYZER_VERSION = "1.1.0"
 
 SKIP_DIRS = {
     ".git", "node_modules", "__pycache__", ".pytest_cache", ".venv", "venv", "dist", "build", ".next",
@@ -90,7 +90,12 @@ LICENSE_PATTERNS = [
     ("BSD-3-Clause (variante)", re.compile(r"BSD 3-Clause", re.I)),
     ("MPL-2.0", re.compile(r"Mozilla Public License,?\s+(Version|v\.?)\s*2\.0", re.I)),
     ("Unlicense", re.compile(r"This is free and unencumbered software", re.I)),
+    ("Proprietária (uso pessoal)", re.compile(r"protected by the copyright laws|personal use|all rights reserved", re.I)),
 ]
+
+# Licenças que permitem reproduzir descrições/metadados com atribuição.
+PERMISSIVE_LICENSES = {"MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause (variante)", "CC0-1.0",
+                       "CC-BY-4.0", "CC-BY-SA-4.0", "Unlicense", "MPL-2.0"}
 
 SECRET_RULES = [
     ("aws_access_key", re.compile(r"AKIA[0-9A-Z]{16}")),
@@ -568,7 +573,10 @@ class RepositoryAnalyzer:
             F.append(Finding("estrutura", "Linguagens predominantes", top, "proven", ["inventário de arquivos"]))
         for fw in man["frameworks"][:25]:
             F.append(Finding("tecnologia", f"Usa {fw['name']}", f"Categoria: {fw['category']}", "proven", fw["evidence"]))
-        if lic["spdx"]:
+        if lic["spdx"] and lic["spdx"] not in PERMISSIVE_LICENSES and lic["spdx"] != "desconhecida":
+            F.append(Finding("licença", f"Licença restritiva: {lic['spdx']}", "Não reutilize código ou conteúdo sem autorização; apenas links podem ser referenciados.",
+                             lic["status"], [lic["file"]], "high"))
+        elif lic["spdx"]:
             F.append(Finding("licença", f"Licença {lic['spdx']}", "Detectada pelo texto do arquivo de licença.", lic["status"], [lic["file"]]))
         else:
             F.append(Finding("licença", "Sem arquivo de licença", "Sem licença explícita, o reuso de código não é autorizado por padrão.", "proven", [], "medium"))

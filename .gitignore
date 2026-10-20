@@ -9,3 +9,5 @@ apps/web/out/
 *.log
 .env
 .DS_Store
+apps/web/next-env.d.ts
+apps/web/tsconfig.tsbuildinfo

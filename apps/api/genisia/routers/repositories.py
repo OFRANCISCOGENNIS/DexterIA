@@ -14,7 +14,7 @@ from ..config import settings
 from ..db import get_db
 from ..deps import Pagination, current_user, get_owned_project, get_owned_repository
 from ..models import Approval, Artifact, Repository, Task, User
-from ..orchestrator.engine import WorkflowError, create_workflow
+from ..orchestrator.engine import BACKGROUND_PRIORITY, WorkflowError, create_workflow
 from ..schemas import AnalyzeIn, ApprovalOut, ArtifactSummary, Page, RepositoryIn, RepositoryOut, TaskOut
 
 router = APIRouter(prefix="/api/repositories", tags=["repositories"])
@@ -107,7 +107,8 @@ def analyze(repo_id: str, body: AnalyzeIn, db: Session = Depends(get_db), user: 
         params["import"] = {}
     try:
         task = create_workflow(db, owner_id=user.id, workflow=body.workflow, repository_id=repo.id, project_id=repo.project_id,
-                               objective=f"{body.workflow} de {repo.name}", params=params)
+                               objective=f"{body.workflow} de {repo.name}", params=params,
+                               priority=BACKGROUND_PRIORITY)
     except WorkflowError as exc:
         raise HTTPException(422, str(exc)) from exc
     repo.last_task_id = task.id

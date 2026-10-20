@@ -11,7 +11,7 @@ from ..db import get_db
 from ..deps import Pagination, current_user, get_owned_project
 from ..execution.workspace import Workspace, WorkspaceError
 from ..models import AgentRun, Approval, Artifact, AuditEvent, Project, Task, User
-from ..orchestrator.engine import WorkflowError, create_workflow
+from ..orchestrator.engine import INTERACTIVE_PRIORITY, WorkflowError, create_workflow
 from ..schemas import (ApprovalOut, ArtifactSummary, Page, ProjectDetail, ProjectIn, ProjectOut, ProjectUpdate, TaskOut,
                        WorkflowIn)
 
@@ -108,7 +108,7 @@ def start_workflow(project_id: str, body: WorkflowIn, db: Session = Depends(get_
     params = {"develop": {"instructions": body.instructions}} if body.instructions else {}
     try:
         return create_workflow(db, owner_id=user.id, workflow=body.workflow, project_id=project.id,
-                               objective=body.objective, params=params)
+                               objective=body.objective, params=params, priority=INTERACTIVE_PRIORITY)
     except WorkflowError as exc:
         raise HTTPException(422, str(exc)) from exc
 

@@ -193,3 +193,23 @@ def test_agents_and_dashboard(client, auth):
     dash = client.get("/api/dashboard", headers=auth).json()
     assert "workflows_by_status" in dash["counts"]
     assert dash["ai_usage"]["cost_usd"] >= 0
+
+
+def test_dispatcher_reserves_capacity_for_interactive_work(client, auth):
+    from genisia.orchestrator.engine import BACKGROUND_PRIORITY, INTERACTIVE_PRIORITY, create_workflow, tick
+
+    project = _project(client, auth)
+    with session_scope() as db:
+        owner = db.get(Task, client.post(f"/api/projects/{project['id']}/workflows", json={"workflow": "plan"}, headers=auth).json()["id"]).owner_id
+        for _ in range(3):
+            create_workflow(db, owner_id=owner, workflow="test", project_id=project["id"], priority=BACKGROUND_PRIORITY)
+    with session_scope() as db:
+        claimed = tick(db, capacity=3)
+        tasks = [db.get(Task, i) for i in claimed]
+        # Interativa primeiro; segundo plano usa uma vaga e a última fica reservada
+        assert sorted(t.priority for t in tasks) == [INTERACTIVE_PRIORITY, BACKGROUND_PRIORITY]
+        for t in tasks:
+            t.status = "cancelled"
+    with session_scope() as db:
+        for t in db.query(Task).filter(Task.status == "queued", Task.project_id == project["id"]):
+            t.status = "cancelled"

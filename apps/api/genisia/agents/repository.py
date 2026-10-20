@@ -8,8 +8,8 @@ from typing import Any
 from sqlalchemy import delete, select
 
 from ..analysis import rea_adapter
-from ..analysis.analyzer import ANALYZER_VERSION, RepositoryAnalyzer, render_markdown
-from ..analysis.importer import ImportErrorDetail, clone, local_commit, validate_local_path
+from ..analysis.analyzer import ANALYZER_VERSION, PERMISSIVE_LICENSES, RepositoryAnalyzer, render_markdown
+from ..analysis.importer import ImportErrorDetail, clone, local_commit, remote_head, validate_local_path
 from ..config import settings
 from ..execution.workspace import Workspace
 from ..knowledge.ingest import INGEST_PROFILES, extract_catalog, profile_for
@@ -54,8 +54,13 @@ class IntegrationAgent(Agent):
         try:
             if repo.source_type == "git":
                 dest = settings.data_dir / "repositories" / repo.id
-                ctx.log(f"Clonando {repo.source_url} (raso, sem submódulos)")
-                sha = clone(repo.source_url, dest, repo.ref)
+                current = remote_head(repo.source_url, repo.ref) if repo.commit_sha and (dest / ".git").is_dir() else None
+                if current and current == repo.commit_sha:
+                    ctx.log(f"Cópia local já está no commit remoto {current[:10]}; clonagem dispensada")
+                    sha = current
+                else:
+                    ctx.log(f"Clonando {repo.source_url} (raso, sem submódulos)")
+                    sha = clone(repo.source_url, dest, repo.ref)
                 repo.local_path = str(dest)
             elif repo.source_type == "local":
                 path = validate_local_path(repo.source_url)
@@ -152,18 +157,29 @@ def ingest_catalog(ctx: AgentContext) -> dict[str, Any]:
         raise NonRetryableError(f"Nenhum item extraído (perfil {profile_name}; arquivos: {used or 'nenhum encontrado'})")
     analysis = ctx.db.get(Artifact, repo.last_analysis_artifact_id) if repo.last_analysis_artifact_id else None
     license_ = ((analysis.data or {}).get("license") or {}).get("spdx") if analysis else None
-    source = ctx.db.scalar(select(KnowledgeSource).where(KnowledgeSource.owner_id == ctx.task.owner_id,
-                                                         KnowledgeSource.origin_url == repo.source_url))
+    # Catálogos de repositórios Git públicos viram conhecimento global da plataforma (compartilhado
+    # entre usuários); ZIPs enviados e diretórios locais permanecem privados de quem os importou.
+    owner_id = None if repo.source_type == "git" else ctx.task.owner_id
+    source = ctx.db.scalar(select(KnowledgeSource).where(
+        KnowledgeSource.owner_id.is_(None) if owner_id is None else KnowledgeSource.owner_id == owner_id,
+        KnowledgeSource.origin_url == repo.source_url))
     if source is None:
-        source = KnowledgeSource(owner_id=ctx.task.owner_id, name=repo.name, kind=INGEST_PROFILES[profile_name]["kind"],
+        source = KnowledgeSource(owner_id=owner_id, name=repo.name, kind=INGEST_PROFILES[profile_name]["kind"],
                                  origin_url=repo.source_url, meta={})
         ctx.db.add(source)
         ctx.db.flush()
     else:
         ctx.db.execute(delete(KnowledgeItem).where(KnowledgeItem.source_id == source.id))
+    links_only = license_ not in PERMISSIVE_LICENSES
+    if links_only:
+        # Sem licença permissiva: guardamos apenas título e URL (referência), nunca descrições.
+        for it in items:
+            it.description = ""
+        ctx.log(f"Licença '{license_ or 'ausente'}' não é permissiva: somente títulos e links serão indexados")
     source.license = license_
     source.origin_commit = repo.commit_sha
     source.meta = {"profile": profile_name, "files": used, "repository_id": repo.id,
+                   "links_only": links_only,
                    "note": "Somente metadados e links; o conteúdo referenciado não é copiado."}
     for it in items:
         ctx.db.add(KnowledgeItem(
@@ -178,4 +194,5 @@ def ingest_catalog(ctx: AgentContext) -> dict[str, Any]:
     for it in items:
         by_type[it.item_type] = by_type.get(it.item_type, 0) + 1
     ctx.log(f"{len(items)} item(ns) indexado(s) de {', '.join(used)} (licença da fonte: {license_ or 'desconhecida'})")
-    return {"source_id": source.id, "items": len(items), "by_type": by_type, "files": used, "license": license_}
+    return {"source_id": source.id, "items": len(items), "by_type": by_type, "files": used, "license": license_,
+            "links_only": links_only}

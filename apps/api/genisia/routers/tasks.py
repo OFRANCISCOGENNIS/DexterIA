@@ -8,7 +8,7 @@ from ..db import get_db
 from ..deps import Pagination, current_user, get_owned_task
 from ..models import AgentRun, Approval, Artifact, Task, User
 from ..orchestrator.engine import WorkflowError, cancel_task, retry_task
-from ..schemas import AgentRunOut, ApprovalOut, ArtifactOut, Page, TaskDetail, TaskOut
+from ..schemas import AgentRunOut, ApprovalOut, ArtifactOut, ArtifactSummary, Page, TaskDetail, TaskOut
 
 router = APIRouter(prefix="/api", tags=["tasks"])
 
@@ -71,6 +71,17 @@ def list_runs(agent: str | None = None, page: Pagination = Depends(), db: Sessio
         stmt = stmt.where(AgentRun.agent == agent)
     total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
     items = db.scalars(stmt.order_by(AgentRun.started_at.desc()).limit(page.limit).offset(page.offset)).all()
+    return {"items": items, "total": total, "limit": page.limit, "offset": page.offset}
+
+
+@router.get("/artifacts", response_model=Page[ArtifactSummary])
+def list_artifacts(kind: str | None = Query(None, max_length=40), page: Pagination = Depends(), db: Session = Depends(get_db),
+                   user: User = Depends(current_user)) -> dict:
+    stmt = select(Artifact).where(Artifact.owner_id == user.id)
+    if kind:
+        stmt = stmt.where(Artifact.kind == kind)
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    items = db.scalars(stmt.order_by(Artifact.created_at.desc()).limit(page.limit).offset(page.offset)).all()
     return {"items": items, "total": total, "limit": page.limit, "offset": page.offset}
 
 

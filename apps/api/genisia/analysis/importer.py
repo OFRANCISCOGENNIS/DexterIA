@@ -89,6 +89,20 @@ def clone(url: str, dest: Path, ref: str | None = None) -> str:
     return git(dest, "rev-parse", "HEAD").strip()
 
 
+def remote_head(url: str, ref: str | None = None) -> str | None:
+    """Commit atual do remoto (sem clonar). Retorna None se não for possível consultar."""
+    url = validate_git_url(url)
+    try:
+        out = git(Path("/"), "ls-remote", "--", url, ref or "HEAD", timeout=60)
+    except (WorkspaceError, subprocess.TimeoutExpired):
+        return None
+    for line in out.splitlines():
+        sha, _, name = line.partition("\t")
+        if re.fullmatch(r"[0-9a-f]{40}", sha) and (ref is None or name.endswith(ref)):
+            return sha
+    return None
+
+
 def validate_local_path(path: str) -> Path:
     """Diretórios locais só podem ser importados se estiverem dentro de GENISIA_IMPORT_ROOTS."""
     if not settings.import_roots:

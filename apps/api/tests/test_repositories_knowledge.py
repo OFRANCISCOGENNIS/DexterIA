@@ -170,3 +170,51 @@ def test_zip_upload_with_traversal_rejected(client, auth):
     task = client.post(f"/api/repositories/{repo['id']}/analyze", json={}, headers=auth).json()
     run_until_idle()
     assert client.get(f"/api/tasks/{task['id']}", headers=auth).json()["status"] == "succeeded"
+
+
+def test_public_git_catalog_is_global_knowledge(client, auth, import_root, monkeypatch):
+    """Catálogos de repositórios Git públicos ficam visíveis para todos os usuários."""
+    import shutil
+
+    from genisia.agents import repository as repo_agent
+    from genisia.db import session_scope
+    from genisia.models import Repository
+    from genisia.security import decode_access_token
+
+    src = import_root / "awesome-global"
+    _git_repo(src, {"README.md": AWESOME_README.replace("FastAPI", "Quarkus Global")})
+
+    def fake_clone(url, dest, ref=None):  # evita rede: copia um repositório local
+        shutil.copytree(src, dest)
+        return "f" * 40
+
+    monkeypatch.setattr(repo_agent, "clone", fake_clone)
+    owner = decode_access_token(auth["Authorization"].split()[1])
+    with session_scope() as db:
+        repo = Repository(owner_id=owner, name="sindresorhus/awesome-teste", source_type="git",
+                          source_url="https://github.com/sindresorhus/awesome-teste", authorization_note="público")
+        db.add(repo)
+        db.flush()
+        repo_id = repo.id
+    task = client.post(f"/api/repositories/{repo_id}/analyze", json={"workflow": "ingest_knowledge", "profile": "awesome"}, headers=auth).json()
+    run_until_idle()
+    assert client.get(f"/api/tasks/{task['id']}", headers=auth).json()["status"] == "succeeded"
+    other = client.post("/api/auth/register", json={"email": "kb-global@example.com", "name": "G", "password": "senha-segura-8"}).json()
+    other_h = {"Authorization": f"Bearer {other['access_token']}"}
+    res = client.get("/api/knowledge/search", params={"q": "quarkus"}, headers=other_h).json()
+    assert res["total"] == 1
+    source_id = res["items"][0]["source_id"]
+    assert client.delete(f"/api/knowledge/sources/{source_id}", headers=other_h).status_code == 404  # global: não removível por usuários
+
+
+
+def test_restrictive_license_indexes_links_only(client, auth, import_root):
+    path = import_root / "roadmap-like"
+    _git_repo(path, {"README.md": AWESOME_README, "license": "Everything in this project is protected by the copyright laws. Personal use only."})
+    repo = client.post("/api/repositories", json={"source_type": "local", "source_url": str(path), "authorization_note": "teste"}, headers=auth).json()
+    task = client.post(f"/api/repositories/{repo['id']}/analyze", json={"workflow": "ingest_knowledge", "profile": "generic"}, headers=auth).json()
+    run_until_idle()
+    ingest = next(s for s in client.get(f"/api/tasks/{task['id']}", headers=auth).json()["steps"] if s["step_key"] == "ingest")
+    assert ingest["result"]["links_only"] is True and ingest["result"]["license"] == "Proprietária (uso pessoal)"
+    res = client.get("/api/knowledge/search", params={"q": "postgresql", "source_id": ingest["result"]["source_id"]}, headers=auth).json()
+    assert res["items"][0]["description"] == ""
