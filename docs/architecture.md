@@ -66,6 +66,11 @@ queued ──(dependências ok)──▶ running ──▶ succeeded
 | `analyze_repository` | import → reverse (+REA) → security / optimize → ai_review (opcional, IA) → report |
 | `ingest_knowledge` | import → reverse → ingest (catálogo → base de conhecimento) |
 
+**Gatilhos agendados** (`orchestrator/scheduler.py`): o despachante verifica a cada 30 s os gatilhos vencidos e
+cria o fluxo com prioridade de segundo plano. Só `test`, `analyze_repository` e `ingest_knowledge` podem ser
+agendados, porque não geram nem executam código por IA. Se a execução anterior ainda estiver ativa, a nova é
+pulada, e a próxima é calculada a partir de agora, sem rajadas de execuções atrasadas.
+
 ## Segurança
 
 - **Autenticação** JWT (HS256) com senhas bcrypt; **autorização** por proprietário em todos os recursos

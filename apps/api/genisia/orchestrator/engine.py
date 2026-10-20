@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import threading
+import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
@@ -361,8 +362,18 @@ class Worker:
             self._inflight.discard(task_id)
 
     def _loop(self) -> None:
+        last_schedule_check = 0.0
         while not self._stop.is_set():
             try:
+                if time.monotonic() - last_schedule_check >= 30:
+                    from .scheduler import run_due_triggers  # import tardio: scheduler depende deste módulo
+
+                    last_schedule_check = time.monotonic()
+                    db = session_factory()()
+                    try:
+                        run_due_triggers(db)
+                    finally:
+                        db.close()
                 with self._lock:
                     busy = len(self._inflight)
                 if busy < self.threads:

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { Triggers } from "@/components/triggers";
 import { Button, Card, Empty, PageHeader, Select, Spinner, Status } from "@/components/ui";
 import { ACTIVE, api, fmtDate, Page, Task } from "@/lib/api";
 import { useApi } from "@/lib/hooks";
@@ -15,7 +16,8 @@ export default function AutomationsPage() {
   const cancel = async (id: string) => { await api(`/tasks/${id}/cancel`, { method: "POST" }); tasks.reload(); };
   return (
     <>
-      <PageHeader title="Automações" subtitle="Fluxos multiagente encadeados, com dependências, tentativas limitadas, cancelamento e aprovação humana. Gatilhos agendados ainda não foram implementados." />
+      <PageHeader title="Automações" subtitle="Fluxos multiagente encadeados, com dependências, tentativas limitadas, cancelamento e aprovação humana." />
+      <Triggers />
       <div className="mb-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {workflows.data?.map((w) => (
           <div key={w.name} className="rounded-lg border border-line bg-panel p-4">

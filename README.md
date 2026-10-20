@@ -18,6 +18,8 @@ aprovação humana.
 | Missão completa | Pesquisa → plano por IA → **sua aprovação** → código por IA → testes no sandbox com correção automática → segurança/otimização → relatório de entrega |
 | Execução isolada | Testes rodam fora do backend: sem rede, usuário sem privilégios, limites de CPU/memória/tempo, cópia descartável |
 | Engenharia reversa | Importação Git (HTTPS), diretório local autorizado ou ZIP; inventário, tecnologias, dependências, pontos de entrada, rotas, licença, segredos, duplicação; ✅ comprovado vs 🔎 hipótese; adaptador para a CLI do [REA](https://github.com/morluto/rea) |
+| Automação | Gatilhos agendados (de hora em hora até semanal) para testes, reanálise de repositórios e reindexação de catálogos, sem sobreposição de execuções; fluxos com IA nunca são agendados |
+| Aprendizagem | Trilhas de estudo montadas a partir de um projeto ou objetivo (fundamentos → prática → aprofundamento), com o motivo de cada escolha, a fonte e o progresso |
 | Base de conhecimento | Ingestão de catálogos (awesome, public-apis, free-programming-books…), busca full-text no PostgreSQL, filtros (tipo, categoria, autenticação de APIs), recomendações por projeto, memória do projeto com exportação e exclusão |
 | Governança | Autenticação JWT, autorização por projeto, auditoria, aprovações, limite de requisições, orçamento de IA por projeto, segredos cifrados |
 
@@ -104,8 +106,7 @@ do SDK, mas **não foi executado contra a API real neste ambiente**, porque não
 **Ainda não implementado:**
 - OAuth/GitHub App para repositórios privados (hoje: HTTPS público, diretório local autorizado ou ZIP)
 - Teste de endpoints das APIs do catálogo e geração de clientes HTTP
-- Gatilhos agendados no Centro de Automação (os fluxos são iniciados manualmente ou via API)
-- Trilhas e exercícios com avaliação automatizada (o módulo de aprendizagem hoje é um catálogo pesquisável)
+- Exercícios de programação com avaliação automatizada (as trilhas indicam materiais, mas ainda não há exercícios próprios)
 - Busca vetorial, Redis e workers distribuídos (ver [decisões](docs/decisions.md))
 
 Documentação técnica: [arquitetura](docs/architecture.md) · [decisões (ADRs)](docs/decisions.md) ·

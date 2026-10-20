@@ -142,3 +142,10 @@ def test_sandbox_cannot_read_platform_data(tmp_path):
     result = run_in_sandbox(tmp_path, ["python3", "-c", f"open({str(secret)!r}).read()"])
     if sandbox_status()["namespace_mode"] == "root":
         assert result.exit_code != 0 and "PermissionError" in result.output
+
+
+def test_clean_removes_underscore_emphasis_only():
+    from genisia.knowledge.ingest import _clean
+
+    assert _clean("**Python**: _Implementing a RESTful API_") == "Python: Implementing a RESTful API"
+    assert _clean("use my_snake_case_name") == "use my_snake_case_name"

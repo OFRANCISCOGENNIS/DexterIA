@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 from .config import API_ROOT, settings
 from .db import get_engine, init_engine
 from .ratelimit import RateLimitMiddleware
-from .routers import approvals, auth, knowledge, projects, repositories, system, tasks
+from .routers import approvals, auth, automation, knowledge, projects, repositories, system, tasks
 
 log = logging.getLogger("genisia")
 
@@ -67,7 +67,8 @@ def create_app() -> FastAPI:
         log.exception("Erro não tratado", exc_info=exc)
         return JSONResponse({"detail": "Erro interno"}, status_code=500)
 
-    for router in (auth.router, projects.router, tasks.router, approvals.router, repositories.router, knowledge.router, system.router):
+    for router in (auth.router, projects.router, tasks.router, approvals.router, repositories.router, knowledge.router,
+                   automation.router, system.router):
         app.include_router(router)
     return app
 

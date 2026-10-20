@@ -9,10 +9,10 @@ MVP no [README](README.md); arquitetura em [docs/architecture.md](docs/architect
 
 - `apps/api/` — backend FastAPI (pacote `genisia`)
   - `routers/` endpoints REST · `schemas.py` Pydantic · `models.py` SQLAlchemy 2 · `migrations/` Alembic
-  - `orchestrator/` motor de fluxos (`engine.py`: `create_workflow`, `tick`, `execute_step`, `recover`) e modelos (`workflows.py`)
+  - `orchestrator/` motor de fluxos (`engine.py`: `create_workflow`, `tick`, `execute_step`, `recover`) modelos (`workflows.py`) e gatilhos agendados (`scheduler.py`)
   - `agents/` agentes (`registry.py` lista todos; contrato em `base.py`: `Agent.run(ctx) -> dict`)
   - `execution/` workspace Git por projeto (`workspace.py`) e sandbox (`sandbox.py`)
-  - `analysis/` analisador estático, importação segura, adaptador REA · `knowledge/` ingestão e busca
+  - `analysis/` analisador estático, importação segura, adaptador REA · `knowledge/` ingestão, busca e trilhas de aprendizagem (`learning.py`)
   - `ai/providers.py` provedor Anthropic, preços e saída estruturada
 - `apps/web/` — Next.js 16 + React 19 + Tailwind 4 (App Router; páginas em `app/(app)/`, componentes em `components/`)
 - `scripts/analyze_references.py` — usa a API para analisar os 11 repositórios de referência → `docs/references/`
@@ -55,6 +55,7 @@ typecheck e o build do frontend. Rode os mesmos comandos antes de fazer push.
 - **Nunca simule resultados de IA ou de ferramentas.** Sem provedor configurado, a etapa falha com mensagem explícita.
   O `FakeProvider` (`tests/fakes.py`, identificado como `fake-test`) existe só para testes.
 - **Código gerado nunca roda no processo do backend.** Use sempre `run_in_sandbox` (sem rede por padrão).
+- Gatilhos agendados só podem iniciar fluxos sem geração de código por IA (`SCHEDULABLE_WORKFLOWS`).
 - Ações sensíveis (executar o plano, excluir projeto ou repositório, liberar rede) exigem um registro `Approval`.
 - Nunca grave segredos em texto puro: use `encrypt_secret` e passe logs por `redact()`. A varredura de segredos guarda só impressões digitais.
 - Caminhos vindos de agentes ou usuários passam por `normalize_relpath`; importação Git só via `validate_git_url`.

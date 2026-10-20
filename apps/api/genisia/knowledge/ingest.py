@@ -35,7 +35,9 @@ def _clean(text: str) -> str:
     text = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", text)
     text = re.sub(r"<[^>]+>|`", "", text)
     text = text.replace("**", "").replace("__", "")
-    text = re.sub(r"\s+", " ", text).strip(" -–—:|")
+    # Ênfase com sublinhado (_texto_) sem tocar em identificadores como snake_case.
+    text = re.sub(r"(?<![\w])_([^_]+?)_(?![\w])", r"\1", text)
+    text = re.sub(r"\s+", " ", text).strip(" -–—:|_")
     return text[:500]
 
 

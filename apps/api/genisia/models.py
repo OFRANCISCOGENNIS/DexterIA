@@ -215,3 +215,51 @@ class Approval(TimestampMixin, Base):
     decided_by: Mapped[str | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class ScheduledTrigger(TimestampMixin, Base):
+    """Gatilho que inicia um fluxo periodicamente (somente fluxos sem geração de código por IA)."""
+
+    __tablename__ = "scheduled_triggers"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    owner_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    project_id: Mapped[str | None] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=True, index=True)
+    repository_id: Mapped[str | None] = mapped_column(ForeignKey("repositories.id", ondelete="CASCADE"), nullable=True, index=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    workflow: Mapped[str] = mapped_column(String(40), nullable=False)
+    interval_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    next_run_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    last_run_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_task_id: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    last_error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    run_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
+
+class LearningPath(TimestampMixin, Base):
+    """Trilha de estudo montada a partir da base de conhecimento, com progresso por item."""
+
+    __tablename__ = "learning_paths"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    owner_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    project_id: Mapped[str | None] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=True, index=True)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    goal: Mapped[str] = mapped_column(Text, default="", nullable=False)
+    keywords: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False)
+
+
+class LearningPathItem(Base):
+    __tablename__ = "learning_path_items"
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    path_id: Mapped[str] = mapped_column(ForeignKey("learning_paths.id", ondelete="CASCADE"), nullable=False, index=True)
+    # Cópia de título/URL/fonte: a trilha continua legível mesmo se a fonte for reindexada.
+    knowledge_item_id: Mapped[str | None] = mapped_column(ForeignKey("knowledge_items.id", ondelete="SET NULL"), nullable=True)
+    position: Mapped[int] = mapped_column(Integer, nullable=False)
+    stage: Mapped[str] = mapped_column(String(40), nullable=False)  # fundamentos | prática | aprofundamento
+    item_type: Mapped[str] = mapped_column(String(30), nullable=False)
+    title: Mapped[str] = mapped_column(String(400), nullable=False)
+    url: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    source_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    reason: Mapped[str] = mapped_column(Text, default="", nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default="todo", nullable=False)  # todo | doing | done
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
