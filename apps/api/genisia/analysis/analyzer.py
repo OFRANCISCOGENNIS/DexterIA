@@ -21,13 +21,15 @@ from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-ANALYZER_VERSION = "1.2.0"
+ANALYZER_VERSION = "1.3.0"
 
 SKIP_DIRS = {
     ".git", "node_modules", "__pycache__", ".pytest_cache", ".venv", "venv", "dist", "build", ".next",
     ".turbo", ".cache", "coverage", "target", "vendor", ".idea", ".vscode", "bower_components",
 }
 MAX_TEXT_BYTES = 400_000
+# Módulos VBA exportados costumam concentrar milhares de linhas num único arquivo.
+VBA_MAX_BYTES = 2_000_000
 MAX_FILES = 60_000
 
 LANGUAGES = {
@@ -40,11 +42,14 @@ LANGUAGES = {
     ".md": "Markdown", ".mdx": "MDX", ".json": "JSON", ".yml": "YAML", ".yaml": "YAML", ".toml": "TOML",
     ".sql": "SQL", ".ipynb": "Jupyter", ".lua": "Lua", ".dart": "Dart", ".ex": "Elixir", ".exs": "Elixir",
     ".r": "R", ".jl": "Julia", ".zig": "Zig", ".astro": "Astro",
+    ".bas": "VBA", ".cls": "VBA", ".frm": "VBA", ".vba": "VBA", ".vbs": "VBScript",
 }
 CODE_LANGUAGES = {
     "Python", "JavaScript", "TypeScript", "Go", "Rust", "Java", "Kotlin", "Ruby", "PHP", "C#", "C", "C++",
     "Swift", "Scala", "Shell", "Vue", "Svelte", "Lua", "Dart", "Elixir", "R", "Julia", "Zig", "PowerShell", "Astro",
+    "VBA", "VBScript",
 }
+VBA_LANGUAGES = {"VBA", "VBScript"}
 
 # Dependência -> (framework/tecnologia, categoria)
 FRAMEWORK_MAP: dict[str, tuple[str, str]] = {
@@ -114,7 +119,14 @@ RISKY_CALLS = [
     ("js_eval", re.compile(r"(?<![\w.])eval\(|new Function\("), ("JavaScript", "TypeScript")),
     ("js_child_process_exec", re.compile(r"child_process['\"]?\)?\.?\s*\.?exec\(|\bexecSync\("), ("JavaScript", "TypeScript")),
     ("js_inner_html", re.compile(r"dangerouslySetInnerHTML|\.innerHTML\s*="), ("JavaScript", "TypeScript")),
+    ("vba_shell", re.compile(r"(?im)(?<![\w.])Shell\s*\(|WScript\.Shell"), ("VBA", "VBScript")),
+    ("vba_kill_file", re.compile(r"(?im)^\s*Kill\s+\S"), ("VBA", "VBScript")),
 ]
+VBA_PROC = re.compile(
+    r"(?im)^[ \t]*(?:(Public|Private|Friend)[ \t]+)?(?:Static[ \t]+)?(Sub|Function|Property[ \t]+(?:Get|Let|Set))[ \t]+(\w+)[ \t]*\(([^)]*)\)")
+VBA_PROC_END = re.compile(r"(?im)^[ \t]*End[ \t]+(?:Sub|Function|Property)\b")
+VBA_OPTION_EXPLICIT = re.compile(r"(?im)^[ \t]*Option[ \t]+Explicit\b")
+VBA_RESUME_NEXT = re.compile(r"(?im)On[ \t]+Error[ \t]+Resume[ \t]+Next")
 ROUTE_PATTERNS = [
     ("FastAPI/Flask", re.compile(r"@(?:\w+\.)?(?:app|router|bp|blueprint|api)\.(get|post|put|patch|delete|route)\(\s*['\"]([^'\"]+)['\"]"), ("Python",)),
     ("Express/Fastify/Hono", re.compile(r"\b(?:app|router|server|fastify)\.(get|post|put|patch|delete|all)\(\s*['\"`](/[^'\"`]*)['\"`]"), ("JavaScript", "TypeScript")),
@@ -145,7 +157,12 @@ def _read_text(path: Path, limit: int = MAX_TEXT_BYTES) -> str | None:
         return None
     if b"\x00" in data[:8192]:
         return None
-    return data[:limit].decode("utf-8", errors="replace")
+    data = data[:limit]
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        # VBA exportado pelo Excel e arquivos legados do Windows usam cp1252, não UTF-8.
+        return data.decode("cp1252", errors="replace")
 
 
 def _walk(root: Path):
@@ -215,8 +232,9 @@ class RepositoryAnalyzer:
             ext = path.suffix.lower()
             lang = LANGUAGES.get(ext) or ("Dockerfile" if path.name == "Dockerfile" else None)
             lines = 0
-            if size <= MAX_TEXT_BYTES and (lang or ext in {".txt", ".cfg", ".ini", ""}):
-                text = _read_text(path)
+            limit = VBA_MAX_BYTES if lang in VBA_LANGUAGES else MAX_TEXT_BYTES
+            if size <= limit and (lang or ext in {".txt", ".cfg", ".ini", ""}):
+                text = _read_text(path, limit)
                 if text is None:
                     binary += 1
                 else:
@@ -370,15 +388,20 @@ class RepositoryAnalyzer:
         risky: list[dict[str, Any]] = []
         symbols = {"classes": 0, "functions": 0}
         long_functions: list[dict[str, Any]] = []
+        vba: dict[str, Any] = {"modules": 0, "procedures": 0, "public_macros": [], "without_option_explicit": [],
+                               "on_error_resume_next": 0}
         analyzed = 0
         for f in self.files:
             lang = f["language"]
-            if lang not in {"Python", "JavaScript", "TypeScript", "Go"} or f["size"] > 300_000:
+            is_vba = lang in VBA_LANGUAGES
+            if lang not in {"Python", "JavaScript", "TypeScript", "Go"} and not is_vba:
+                continue
+            if f["size"] > (VBA_MAX_BYTES if is_vba else 300_000):
                 continue
             if analyzed >= 8000:
                 break
             analyzed += 1
-            text = _read_text(self.root / f["path"])
+            text = _read_text(self.root / f["path"], VBA_MAX_BYTES if is_vba else MAX_TEXT_BYTES)
             if text is None:
                 continue
             if lang == "Python":
@@ -407,6 +430,8 @@ class RepositoryAnalyzer:
                         else:
                             external_imports[mod] += 1
                     py_modules[f["path"]] = {"imports": sorted(imports)}
+            elif is_vba:
+                self._vba_structure(f["path"], text, vba, long_functions)
             elif lang in {"JavaScript", "TypeScript"}:
                 for spec in JS_IMPORT.findall(text):
                     if spec.startswith((".", "/")):
@@ -444,9 +469,29 @@ class RepositoryAnalyzer:
             "routes": routes,
             "risky_calls": risky,
             "long_functions": sorted(long_functions, key=lambda x: -x["lines"])[:20],
+            "vba": {**vba, "public_macros": vba["public_macros"][:50]},
             "test_files": len(tests),
             "test_examples": tests[:15],
         }
+
+    @staticmethod
+    def _vba_structure(path: str, text: str, vba: dict[str, Any], long_functions: list[dict[str, Any]]) -> None:
+        vba["modules"] += 1
+        if not VBA_OPTION_EXPLICIT.search(text):
+            vba["without_option_explicit"].append(path)
+        vba["on_error_resume_next"] += len(VBA_RESUME_NEXT.findall(text))
+        ends = [m.start() for m in VBA_PROC_END.finditer(text)]
+        for m in VBA_PROC.finditer(text):
+            vba["procedures"] += 1
+            scope, kind, name, args = m.group(1), m.group(2), m.group(3), m.group(4)
+            end = next((e for e in ends if e > m.start()), None)
+            if end is not None:
+                length = text.count("\n", m.start(), end) + 1
+                if length >= 80:
+                    long_functions.append({"path": path, "name": name, "lines": length})
+            # Sub pública sem parâmetros aparece em Alt+F8: é um ponto de entrada do usuário.
+            if kind.lower() == "sub" and (scope or "Public").lower() == "public" and not args.strip():
+                vba["public_macros"].append({"path": path, "name": name, "line": text.count("\n", 0, m.start()) + 1})
 
     # ------------------------------------------------------------------ documentação
     def documentation(self) -> dict[str, Any]:
@@ -528,12 +573,13 @@ class RepositoryAnalyzer:
         windows: dict[str, list[str]] = defaultdict(list)
         checked = 0
         for f in self.files:
-            if f["language"] not in CODE_LANGUAGES or f["size"] > 200_000 or checked > 3000:
+            is_vba = f["language"] in VBA_LANGUAGES
+            if f["language"] not in CODE_LANGUAGES or f["size"] > (VBA_MAX_BYTES if is_vba else 200_000) or checked > 3000:
                 continue
             checked += 1
-            text = _read_text(self.root / f["path"]) or ""
+            text = _read_text(self.root / f["path"], VBA_MAX_BYTES if is_vba else MAX_TEXT_BYTES) or ""
             lines = [ln.strip() for ln in text.splitlines()]
-            lines = [ln for ln in lines if len(ln) > 3 and not ln.startswith(("#", "//", "import ", "from ", "*"))]
+            lines = [ln for ln in lines if len(ln) > 3 and not ln.startswith(("#", "//", "'", "import ", "from ", "*"))]
             seen_in_file: set[str] = set()
             for i in range(0, max(len(lines) - 5, 0)):
                 block = "\n".join(lines[i:i + 6])
@@ -619,8 +665,21 @@ class RepositoryAnalyzer:
         if man["entry_points"]:
             F.append(Finding("interfaces", f"{len(man['entry_points'])} ponto(s) de entrada", "Declarados em manifestos ou por convenção de nome.",
                              "proven", [f"{e['kind']}: {e['target']} ({e['evidence']})" for e in man["entry_points"][:10]]))
+        vba = code["vba"]
+        if vba["public_macros"]:
+            F.append(Finding("interfaces", f"{len(vba['public_macros'])} macro(s) VBA pública(s)",
+                             "Subs públicas sem parâmetros, executáveis pelo usuário em Alt+F8.", "proven",
+                             [f"{m['path']}:{m['line']} {m['name']}" for m in vba["public_macros"][:10]]))
+        if vba["without_option_explicit"]:
+            F.append(Finding("qualidade", f"{len(vba['without_option_explicit'])} módulo(s) VBA sem Option Explicit",
+                             "Sem Option Explicit, um erro de digitação vira uma variável nova em vez de um erro de compilação.",
+                             "proven", vba["without_option_explicit"][:10], "medium"))
+        if vba["on_error_resume_next"] >= 20:
+            F.append(Finding("qualidade", f"{vba['on_error_resume_next']} ocorrência(s) de On Error Resume Next",
+                             "Uso extenso pode esconder falhas; confira se cada bloco restaura o tratamento de erro.",
+                             "hypothesis", [], "low"))
         if code["long_functions"]:
-            F.append(Finding("otimização", f"{len(code['long_functions'])} função(ões) Python com 80+ linhas", "Candidatas a refatoração.",
+            F.append(Finding("otimização", f"{len(code['long_functions'])} função(ões) com 80+ linhas", "Candidatas a refatoração.",
                              "proven", [f"{x['path']}:{x['name']} ({x['lines']} linhas)" for x in code["long_functions"][:5]], "low"))
         if dup["duplicated_blocks"] > 20:
             F.append(Finding("otimização", f"{dup['duplicated_blocks']} blocos de código duplicados", "Janelas de 6 linhas normalizadas repetidas entre arquivos.",
@@ -672,6 +731,7 @@ class RepositoryAnalyzer:
             "limitations": [
                 "Análise estática: nenhum código foi executado; comportamento em tempo de execução não foi observado.",
                 "Imports JavaScript/TypeScript e rotas HTTP são extraídos por padrões textuais (não por análise semântica).",
+                "VBA é analisado por padrões textuais (procedimentos, macros públicas, Option Explicit), sem compilação.",
                 "Varredura de segredos baseada em padrões: pode haver falsos positivos e falsos negativos.",
                 f"Limites: até {MAX_FILES} arquivos, {MAX_TEXT_BYTES // 1000} KB por arquivo de texto, 8000 arquivos de código analisados.",
             ],
@@ -737,6 +797,15 @@ def render_markdown(report: dict[str, Any], *, source: str = "", commit: str | N
         for r in code["routes"][:30]:
             lines.append(f"| {r['method']} | `{r['path']}` | `{r['file']}` |")
         lines.append("")
+    vba = code.get("vba") or {}
+    if vba.get("modules"):
+        lines += ["## VBA ✅", "",
+                  f"- Módulos: {vba['modules']} · procedimentos: {vba['procedures']} · "
+                  f"`On Error Resume Next`: {vba['on_error_resume_next']}", ""]
+        if vba["public_macros"]:
+            lines += ["| Macro (Alt+F8) | Arquivo |", "|---|---|"]
+            lines += [f"| `{m['name']}` | `{m['path']}:{m['line']}` |" for m in vba["public_macros"][:30]]
+            lines.append("")
     ext = code["external_imports_js"][:12] or code["external_imports_python"][:12]
     if ext:
         lines += ["## Módulos externos mais importados", ""]

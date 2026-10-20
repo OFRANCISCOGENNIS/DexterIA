@@ -58,7 +58,7 @@ class OptimizationAgent(Agent):
         code = analyzer.code_structure()
         md = [f"# Métricas de otimização — {name}", "", f"- Linhas de código: {inv['code_lines']}",
               f"- Blocos duplicados (janelas de 6 linhas): {dup['duplicated_blocks']}",
-              f"- Funções Python com 80+ linhas: {len(code['long_functions'])}", ""]
+              f"- Funções com 80+ linhas: {len(code['long_functions'])}", ""]
         if dup["top_pairs"]:
             md += ["## Pares com mais duplicação", ""] + [f"- `{p['a']}` ↔ `{p['b']}`: {p['blocks']} blocos" for p in dup["top_pairs"]] + [""]
         if code["long_functions"]:
