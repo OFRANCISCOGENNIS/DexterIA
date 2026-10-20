@@ -87,12 +87,12 @@ INTERACTIVE_PRIORITY = 3  # fluxos de projeto iniciados pelo usuário
 BACKGROUND_PRIORITY = 6   # análises/ingestões de repositórios (longas)
 
 
-def tick(db: Session, capacity: int | None = None) -> list[str]:
+def tick(db: Session, capacity: int | None = None, pool_size: int | None = None) -> list[str]:
     """Propaga bloqueios, finaliza fluxos concluídos e reivindica etapas prontas.
 
-    ``capacity`` limita quantas etapas são reivindicadas (vagas livres no pool). Etapas de segundo
-    plano nunca ocupam a última vaga livre, para que tarefas interativas não fiquem presas atrás de
-    análises demoradas. Retorna os ids das etapas reivindicadas (status ``running``).
+    ``capacity`` limita quantas etapas são reivindicadas (vagas livres no pool de ``pool_size`` threads).
+    Etapas de segundo plano nunca ocupam a última vaga livre (em pools com mais de uma thread), para que
+    tarefas interativas não fiquem presas atrás de análises demoradas. Retorna os ids das etapas reivindicadas (status ``running``).
     """
     claimed: list[str] = []
     queued = db.scalars(select(Task).where(Task.kind == "step", Task.status == "queued")
@@ -113,7 +113,7 @@ def tick(db: Session, capacity: int | None = None) -> list[str]:
             free = capacity - len(claimed)
             if free <= 0:
                 break
-            if task.priority > INTERACTIVE_PRIORITY and free <= 1 and capacity > 1:
+            if task.priority > INTERACTIVE_PRIORITY and free <= 1 and (pool_size or capacity) > 1:
                 continue
         result = db.execute(update(Task).where(Task.id == task.id, Task.status == "queued").values(
             status="running", attempts=Task.attempts + 1, started_at=utcnow()))
@@ -368,7 +368,7 @@ class Worker:
                 if busy < self.threads:
                     db = session_factory()()
                     try:
-                        claimed = tick(db, capacity=self.threads - busy)
+                        claimed = tick(db, capacity=self.threads - busy, pool_size=self.threads)
                     finally:
                         db.close()
                     for task_id in claimed:

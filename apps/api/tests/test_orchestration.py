@@ -211,5 +211,8 @@ def test_dispatcher_reserves_capacity_for_interactive_work(client, auth):
         for t in tasks:
             t.status = "cancelled"
     with session_scope() as db:
+        # Pool de 4 threads com 3 ocupadas: a única vaga livre não vai para segundo plano
+        assert all(db.get(Task, i).priority == INTERACTIVE_PRIORITY for i in tick(db, capacity=1, pool_size=4))
+    with session_scope() as db:
         for t in db.query(Task).filter(Task.status == "queued", Task.project_id == project["id"]):
             t.status = "cancelled"
