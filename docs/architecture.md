@@ -93,4 +93,4 @@ queued ──(dependências ok)──▶ running ──▶ succeeded
   dedicados (a fila já é o banco, então a troca não muda o modelo de dados).
 - Quando o backend não roda como root, o sandbox usa namespace de usuário (`unshare -r`), que isola a rede
   mas não troca o usuário efetivo — nesse caso prefira o backend Docker.
-- O backend Docker do sandbox está implementado mas não foi validado (ambiente sem daemon Docker).
+- O backend Docker do sandbox é validado no CI (runners sem namespaces de usuário); o backend `namespace` é validado localmente como root.

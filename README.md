@@ -56,7 +56,11 @@ A documentação da API (OpenAPI) fica em http://localhost:8000/docs.
 As variáveis disponíveis estão em [`.env.example`](.env.example). O backend lê variáveis de ambiente (use
 `set -a; source .env; set +a`).
 
-> **Sandbox e permissões:** com o backend rodando como root, o código testado roda como o usuário 65534.
+> **Sandbox:** em Linux com namespaces, o backend padrão é `namespace`. Sem namespaces (ex.: runners do GitHub), use Docker:
+> `docker build -t genisia-sandbox:latest -f infrastructure/docker/sandbox.Dockerfile infrastructure/docker`.
+> Os dois backends são exercitados pelos testes (local e CI).
+>
+> **Permissões:** com o backend rodando como root, o código testado roda como o usuário 65534.
 > Esse usuário precisa atravessar o diretório do sandbox. Se algum diretório ancestral de `apps/api/data` não
 > tiver permissão `o+x`, defina `GENISIA_SANDBOX_DIR=/var/tmp/genisia-sandbox`. O estado do sandbox aparece
 > em **Configurações**.
@@ -103,7 +107,6 @@ do SDK, mas **não foi executado contra a API real neste ambiente**, porque não
 - Gatilhos agendados no Centro de Automação (os fluxos são iniciados manualmente ou via API)
 - Trilhas e exercícios com avaliação automatizada (o módulo de aprendizagem hoje é um catálogo pesquisável)
 - Busca vetorial, Redis e workers distribuídos (ver [decisões](docs/decisions.md))
-- O backend Docker do sandbox existe, mas não foi validado (o ambiente não tinha daemon Docker)
 
 Documentação técnica: [arquitetura](docs/architecture.md) · [decisões (ADRs)](docs/decisions.md) ·
 [avaliação de integração dos repositórios](docs/integration-evaluation.md).
